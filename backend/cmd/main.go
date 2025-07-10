@@ -1,14 +1,13 @@
 package main
 
 import (
+	"fitgym/backend/internal"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
-
-	"fitgym-backend/internal"
 )
 
 func main() {
