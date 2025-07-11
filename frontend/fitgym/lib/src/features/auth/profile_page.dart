@@ -9,7 +9,7 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  int _selectedIndex = 1;
+  int _selectedIndex = 0;
   String _name = 'John Doe';
   String _email = 'johndoe@email.com';
 
@@ -29,13 +29,13 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() => _selectedIndex = index);
     switch (index) {
       case 0:
-        context.go('/'); // Welcome
-        break;
-      case 1:
         context.go('/profile');
         break;
-      case 2:
+      case 1:
         context.go('/workout-log');
+        break;
+      case 2:
+        context.go('/workout-history');
         break;
     }
   }
@@ -216,16 +216,19 @@ class _ProfilePageState extends State<ProfilePage> {
         onDestinationSelected: _onNavTap,
         destinations: const [
           NavigationDestination(
-            icon: Icon(Icons.home),
-            label: 'Welcome',
-          ),
-          NavigationDestination(
             icon: Icon(Icons.person),
             label: 'Profile',
+            tooltip: '',
           ),
           NavigationDestination(
             icon: Icon(Icons.fitness_center),
             label: 'Workout Log',
+            tooltip: '',
+          ),
+          NavigationDestination(
+            icon: Icon(Icons.history),
+            label: 'History',
+            tooltip: '',
           ),
         ],
       ),
