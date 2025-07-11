@@ -1,12 +1,16 @@
 package model
 
 import (
+	"time"
+
 	"github.com/google/uuid"
 )
 
-type Goal struct {
+type Workout struct {
 	ID        uuid.UUID `gorm:"type:uuid;primary_key"`
-	Title     string
-	Completed bool
 	UserID    uuid.UUID `gorm:"type:uuid"`
+	Notes     string
+	Date      time.Time `gorm:"type:date"`
+	Exercises []Exercise
+	Completed bool
 }
