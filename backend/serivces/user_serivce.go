@@ -2,7 +2,7 @@ package serivces
 
 import (
 	"errors"
-	"fitgym/backend/model"
+	"fitgym/backend/repository/model"
 )
 
 var (
