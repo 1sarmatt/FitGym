@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"fitgym/backend/postgres"
+	"fitgym/backend/repository/postgres"
 
 	"log"
 	"net/http"
@@ -10,22 +10,23 @@ import (
 	"github.com/google/uuid"
 )
 
-
 func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 	type reqBody struct {
-		UserID      uuid.UUID `json:"user_id"`
-		FriendID	uuid.UUID  `json:"friend_id"`
+		UserID   uuid.UUID `json:"user_id"`
+		FriendID uuid.UUID `json:"friend_id"`
 	}
 	var req reqBody
-	err := postgres.AddFriend(req.UserID,req.FriendID)
+
+	err := postgres.AddFriend(req.UserID, req.FriendID)
 	log.Logger(err)
 }
 
-func GetFriendsHandler(w http.ResponseWriter, r *http.Request){
+func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 	type reqBody struct {
-		UserID      uuid.UUID `json:"user_id"`
+		UserID uuid.UUID `json:"user_id"`
 	}
 	var req reqBody
-	err:= postgres.GetFriends(req.UserID)
+	user, err := postgres.GetFriends(req.UserID)
 	log.Logger(err)
+	json.NewEncoder(w).Encode(user)
 }
