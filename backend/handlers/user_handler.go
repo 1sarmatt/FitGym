@@ -8,7 +8,7 @@ import (
 	"fitgym/backend/serivces"
 )
 
-var userHandler *serivces.User_Service
+var UserHandler *serivces.User_Service
 var UserRepo *postgres.UserRepository // Should be initialized in main.go
 
 // Handler for editing user profile
@@ -22,7 +22,7 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-	ok, err := userHandler.EditProfile(req.Name, req.Age, *UserRepo)
+	ok, err := UserHandler.EditProfile(req.Name, req.Age, *UserRepo)
 	if err != nil || !ok {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -43,7 +43,7 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
 		return
 	}
-	token, err := userHandler.Register(req.Email, req.Password, *UserRepo)
+	token, err := UserHandler.Register(req.Email, req.Password, *UserRepo)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -63,7 +63,7 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
 		return
 	}
-	token, err := userHandler.Login(req.Email, req.Password, *UserRepo)
+	token, err := UserHandler.Login(req.Email, req.Password, *UserRepo)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
