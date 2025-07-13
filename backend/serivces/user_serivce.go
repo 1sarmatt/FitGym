@@ -1,7 +1,11 @@
 package serivces
 
 import (
+	"fitgym/backend/internal"
 	"fitgym/backend/repository/model"
+	"fitgym/backend/repository/postgres"
+
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User_Service struct {
@@ -14,31 +18,61 @@ func NewUserService() *User_Service {
 	}
 }
 
-func (service *User_Service) Register() {
+func (service *User_Service) Register(email, password string, repo postgres.UserRepository) (string, error) {
+	// Check if user already exists in the database
+	existingUser, err := repo.GetUserByEmail(email)
+	if err == nil && existingUser != nil {
+		return "", ErrorUserAlreadyExists
+	}
+	// Hash the password
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
+	}
+	newUser := &model.User{
+		Email:        email,
+		PasswordHash: string(hash),
+	}
+	if err := repo.CreateUser(newUser); err != nil {
+		return "", err
+	}
+	service.user = newUser
 
+	// Generate JWT token
+	token, err := internal.GenerateJWT(service.user.Email)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
 
-func (service *User_Service) Login() {
+func (service *User_Service) Login(email, password string, repo postgres.UserRepository) (string, error) {
+	// Fetch user from repository
+	user, err := repo.GetUserByEmail(email)
+	if err != nil || user == nil {
+		return "", ErrorInvalidCredentials
+	}
+	// Compare password hash
+	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)); err != nil {
+		return "", ErrorInvalidCredentials
+	}
+	service.user = user
 
+	// Generate JWT token
+	token, err := internal.GenerateJWT(service.user.Email)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }
 
-func (service *User_Service) EditProfile(index int, name string, age int) (bool, error) {
+func (service *User_Service) EditProfile(index int, name string) (bool, error) {
 	if name == "" {
 		return false, ErrorUserNameEmpty
 	}
-	if age > 100 || age < 5 {
-		return false, ErrorUserAge
-	}
 
 	user := service.user
-
 	user.Name = name
-	user.Age = age
-
 	service.user = user
 	return true, nil
-}
-
-func (service *User_Service) SetGoals() {
-
 }
