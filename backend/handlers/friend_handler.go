@@ -10,6 +10,8 @@ import (
 	"github.com/google/uuid"
 )
 
+var FriendRepo *postgres.FriendRepository
+
 func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 	type reqBody struct {
 		UserID   uuid.UUID `json:"user_id"`
@@ -17,8 +19,10 @@ func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var req reqBody
 
-	err := postgres.AddFriend(req.UserID, req.FriendID)
-	log.Logger(err)
+	err := friendRepo.AddFriend(req.UserID, req.FriendID)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
@@ -26,7 +30,9 @@ func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 		UserID uuid.UUID `json:"user_id"`
 	}
 	var req reqBody
-	user, err := postgres.GetFriends(req.UserID)
-	log.Logger(err)
+	user, err := friendRepo.GetFriends(req.UserID)
+	if err != nil {
+		log.Fatal(err)
+	}
 	json.NewEncoder(w).Encode(user)
 }
