@@ -1,8 +1,10 @@
 package main
 
 import (
+	"fitgym/backend/handlers"
 	"fitgym/backend/internal"
 	"fitgym/backend/repository/model"
+	"fitgym/backend/serivces"
 	"log"
 	"net/http"
 	"os"
@@ -27,9 +29,10 @@ func main() {
 
 	r := chi.NewRouter()
 
-	// Public route
+	workoutService := serivces.NewWorkoutService()
+	handlers.WorkoutService = workoutService
+
 	r.Get("/login", func(w http.ResponseWriter, r *http.Request) {
-		// Example: always returns a token for user id 123
 		token, err := internal.GenerateJWT("123")
 		if err != nil {
 			http.Error(w, "Could not generate token", http.StatusInternalServerError)
@@ -37,6 +40,10 @@ func main() {
 		}
 		w.Write([]byte(token))
 	})
+
+	r.Post("/addWorkout", handlers.AddWorkoutHandler)
+	r.Post("/addExercise", handlers.AddExerciseHandler)
+	r.Get("/GetWorkoutHistory", handlers.GetWorkoutHistoryHandler)
 
 	// Protected route
 	r.With(internal.JWTAuthMiddleware).Get("/protected", func(w http.ResponseWriter, r *http.Request) {
