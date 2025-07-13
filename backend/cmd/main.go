@@ -31,17 +31,19 @@ func main() {
 	r := chi.NewRouter()
 
 	workoutService := serivces.NewWorkoutService()
+	userService := serivces.NewUserService()
 	handlers.WorkoutService = workoutService
+	handlers.UserHandler = userService
 	handlers.FriendRepo = pg.NewFriendRepository(db)
 	handlers.UserRepo = pg.NewUserRepository(db)
 
 	r.Post("/addWorkout", handlers.AddWorkoutHandler)
 	r.Post("/addExercise", handlers.AddExerciseHandler)
-	r.Get("/GetWorkoutHistory", handlers.GetWorkoutHistoryHandler)
-	r.Post("/AddFriend", handlers.AddFriendHandler)
-	r.Get("/GetFriends", handlers.GetFriendsHandler)
-	r.Post("/Register", handlers.RegisterUserHandler)
-	r.Get("/Login", handlers.LoginUserHandler)
+	r.Get("/getWorkoutHistory", handlers.GetWorkoutHistoryHandler)
+	r.Post("/addFriend", handlers.AddFriendHandler)
+	r.Get("/getFriends", handlers.GetFriendsHandler)
+	r.Post("/register", handlers.RegisterUserHandler)
+	r.Post("/login", handlers.LoginUserHandler)
 
 	// Protected route
 	r.With(internal.JWTAuthMiddleware).Get("/protected", func(w http.ResponseWriter, r *http.Request) {

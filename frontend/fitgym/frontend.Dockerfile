@@ -23,4 +23,4 @@ RUN flutter clean
 RUN flutter pub get
 RUN flutter build web
 
-RUN flutter build web --release
+CMD ["flutter", "build", "web", "--release"] 
