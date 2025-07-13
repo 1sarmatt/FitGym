@@ -25,7 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.AutoMigrate(&model.User{}, &model.Goal{})
+	db.AutoMigrate(&model.User{})
 
 	r := chi.NewRouter()
 
@@ -44,6 +44,8 @@ func main() {
 	r.Post("/addWorkout", handlers.AddWorkoutHandler)
 	r.Post("/addExercise", handlers.AddExerciseHandler)
 	r.Get("/GetWorkoutHistory", handlers.GetWorkoutHistoryHandler)
+	r.Post("/AddFriend", handlers.AddFriendHandler)
+	r.Get("/GetFriends", handlers.GetFriendsHandler)
 
 	// Protected route
 	r.With(internal.JWTAuthMiddleware).Get("/protected", func(w http.ResponseWriter, r *http.Request) {
