@@ -1,14 +1,19 @@
 package main
 
 import (
+	"fitgym/backend/handlers"
+	"fitgym/backend/internal"
+	"fitgym/backend/repository/model"
+	pg "fitgym/backend/repository/postgres"
+	"fitgym/backend/serivces"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/joho/godotenv"
-
-	"fitgym-backend/internal"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 func main() {
@@ -17,18 +22,26 @@ func main() {
 		log.Println("No .env file found, using environment variables")
 	}
 
+	db, err := gorm.Open(postgres.Open(os.Getenv("DATABASE_URL")), &gorm.Config{})
+	if err != nil {
+		log.Fatal(err)
+	}
+	db.AutoMigrate(&model.User{})
+
 	r := chi.NewRouter()
 
-	// Public route
-	r.Get("/login", func(w http.ResponseWriter, r *http.Request) {
-		// Example: always returns a token for user id 123
-		token, err := internal.GenerateJWT("123")
-		if err != nil {
-			http.Error(w, "Could not generate token", http.StatusInternalServerError)
-			return
-		}
-		w.Write([]byte(token))
-	})
+	workoutService := serivces.NewWorkoutService()
+	handlers.WorkoutService = workoutService
+	handlers.FriendRepo = pg.NewFriendRepository(db)
+	handlers.UserRepo = pg.NewUserRepository(db)
+
+	r.Post("/addWorkout", handlers.AddWorkoutHandler)
+	r.Post("/addExercise", handlers.AddExerciseHandler)
+	r.Get("/GetWorkoutHistory", handlers.GetWorkoutHistoryHandler)
+	r.Post("/AddFriend", handlers.AddFriendHandler)
+	r.Get("/GetFriends", handlers.GetFriendsHandler)
+	r.Post("/Register", handlers.RegisterUserHandler)
+	r.Get("/Login", handlers.LoginUserHandler)
 
 	// Protected route
 	r.With(internal.JWTAuthMiddleware).Get("/protected", func(w http.ResponseWriter, r *http.Request) {
