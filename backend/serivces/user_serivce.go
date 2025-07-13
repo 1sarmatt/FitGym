@@ -5,12 +5,12 @@ import (
 )
 
 type User_Service struct {
-	users map[int]model.User
+	user *model.User
 }
 
 func NewUserService() *User_Service {
 	return &User_Service{
-		users: make(map[int]model.User),
+		user: &model.User{},
 	}
 }
 
@@ -30,12 +30,12 @@ func (service *User_Service) EditProfile(index int, name string, age int) (bool,
 		return false, ErrorUserAge
 	}
 
-	user := service.users[index]
+	user := service.user
 
 	user.Name = name
 	user.Age = age
 
-	service.users[index] = user
+	service.user = user
 	return true, nil
 }
 
