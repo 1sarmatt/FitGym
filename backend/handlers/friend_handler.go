@@ -19,7 +19,7 @@ func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	var req reqBody
 
-	err := friendRepo.AddFriend(req.UserID, req.FriendID)
+	err := FriendRepo.AddFriend(req.UserID, req.FriendID)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,7 +30,7 @@ func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 		UserID uuid.UUID `json:"user_id"`
 	}
 	var req reqBody
-	user, err := friendRepo.GetFriends(req.UserID)
+	user, err := FriendRepo.GetFriends(req.UserID)
 	if err != nil {
 		log.Fatal(err)
 	}
