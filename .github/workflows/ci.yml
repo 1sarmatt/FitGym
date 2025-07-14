@@ -1,0 +1,81 @@
+name: CI/CD with Docker Compose and GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Required for gh-pages deploy
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose -y
+
+      - name: Create .env files from example
+        run: |
+          cp ./backend/.env.example ./backend/.env
+          cp ./frontend/.env.example ./frontend/.env
+
+      - name: Ensure required ports are free
+        run: |
+          for port in 8080 80 5432; do
+            if lsof -i :$port; then
+              echo "Port $port is occupied"
+              exit 1
+            else
+              echo "Port $port is free"
+            fi
+          done
+
+      - name: Build and start services
+        run: docker-compose up -d --build
+
+      - name: Wait for services to start
+        run: sleep 30
+
+      - name: Show running containers (debug)
+        run: docker ps
+
+      - name: Check postgres is running
+        run: |
+          docker ps | grep postgres && echo "Postgres is running" || (echo "Postgres is not running" && exit 1)
+
+      - name: Check backend is running
+        run: |
+          docker ps | grep backend && echo "Backend is running" || (echo "Backend is not running" && exit 1)
+
+      - name: Check frontend is running
+        run: |
+          docker ps | grep frontend && echo "Frontend is running" || (echo "Frontend is not running" && exit 1)
+
+      - name: Check nginx is running
+        run: |
+          docker ps | grep nginx && echo "Nginx is running" || (echo "Nginx is not running" && exit 1)
+
+      - name: Test frontend page loads
+        run: |
+          curl -s http://localhost | grep -q "<title>" && echo "Frontend page loads" || (echo "Frontend page failed to load" && exit 1)
+
+      - name: Copy Flutter web build from frontend container
+        run: |
+          CONTAINER_ID=$(docker ps -qf "name=frontend")
+          docker cp "$CONTAINER_ID:/app/build/web" ./flutter-web
+
+      - name: Shutdown containers
+        if: always()
+        run: docker-compose down -v
+
+      # - name: Deploy to GitHub Pages
+      #   uses: peaceiris/actions-gh-pages@v4
+      #   with:
+      #     github_token: ${{ secrets.GITHUB_TOKEN }}
+      #     publish_dir: ./flutter-web
