@@ -2,7 +2,10 @@ name: CI/CD with Docker Compose and GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: 
+      - main
+      - feature/devops
+      - dev
 
 jobs:
   build-test-deploy:
