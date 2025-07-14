@@ -7,6 +7,8 @@ import (
 	"gorm.io/gorm"
 )
 
+var UserRepo *UserRepository
+
 type WorkoutRepository struct {
 	db *gorm.DB
 }
@@ -26,6 +28,18 @@ func (r *WorkoutRepository) GetWorkoutsByUserID(id uuid.UUID) ([]model.Workout, 
 		return nil, err
 	}
 	return workouts, nil
+}
+
+func (r *WorkoutRepository) GetWorkoutID(userEmail, workoutName string) (uuid.UUID, error) {
+	var workout model.Workout
+	userID, err := UserRepo.GetUserIDByEmail(userEmail)
+	if err != nil {
+		return uuid.UUID{}, err
+	}
+	if err := r.db.Where("user_id = ? AND name = ?", userID, workoutName).First(&workout).Error; err != nil {
+		return uuid.UUID{}, err
+	}
+	return workout.ID, nil
 }
 
 func (r *WorkoutRepository) GetWorkoutByID(id uuid.UUID) (*model.Workout, error) {

@@ -46,9 +46,9 @@ func main() {
 	handlers.FriendRepo = pg.NewFriendRepository(db)
 	handlers.UserRepo = pg.NewUserRepository(db)
 
-	r.Post("/addWorkout", handlers.AddWorkoutHandler)
-	r.Post("/addExercise", handlers.AddExerciseHandler)
-	r.Get("/getWorkoutHistory", handlers.GetWorkoutHistoryHandler)
+	r.With(internal.JWTAuthMiddleware).Post("/addWorkout", handlers.AddWorkoutHandler)
+	r.With(internal.JWTAuthMiddleware).Post("/addExercise", handlers.AddExerciseHandler)
+	r.With(internal.JWTAuthMiddleware).Get("/getWorkoutHistory", handlers.GetWorkoutHistoryHandler)
 	r.With(internal.JWTAuthMiddleware).Post("/addFriend", handlers.AddFriendHandler)
 	r.With(internal.JWTAuthMiddleware).Get("/getFriends", handlers.GetFriendsHandler)
 	r.With(internal.JWTAuthMiddleware).Post("/editProfile", handlers.EditProfileHandler)

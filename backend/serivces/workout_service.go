@@ -27,9 +27,9 @@ func NewWorkoutService() *WorkoutService {
 	}
 }
 
-func (ws *WorkoutService) AddWorkout(userID uuid.UUID, workoutType string, date time.Time, duration int, notes string) error {
+func (ws *WorkoutService) AddWorkout(userID uuid.UUID, workoutName string, date time.Time, duration int, notes string) error {
 
-	if workoutType == "" {
+	if workoutName == "" {
 		return ErrorWorkoutTypeEmpty
 	}
 
@@ -38,20 +38,19 @@ func (ws *WorkoutService) AddWorkout(userID uuid.UUID, workoutType string, date 
 	}
 
 	workout := model.Workout{
-		UserID:    userID,
-		Date:      date,
-		Notes:     notes,
-		Completed: false,
+		UserID:      userID,
+		WorkoutName: workoutName,
+		Date:        date,
+		Notes:       notes,
+		Completed:   false,
 	}
 	WorkoutRepo.CreateWorkout(&workout)
 	return nil
 }
 
-func (ws *WorkoutService) AddExercise(workoutID uuid.UUID, name string, sets, reps int, weight float32) error {
-	if workoutID == uuid.Nil {
-		return ErrorWorkoutID
-	}
-	if name == "" {
+func (ws *WorkoutService) AddExercise(userEmail, workoutName string, excerciseName string, sets, reps int, weight float32) error {
+
+	if workoutName == "" {
 		return ErrorWorkoutNameEmpty
 	}
 	if sets < 1 || reps < 1 {
@@ -60,9 +59,14 @@ func (ws *WorkoutService) AddExercise(workoutID uuid.UUID, name string, sets, re
 	if weight < 0 {
 		return ErrorWeight
 	}
+
+	workoutID, err := WorkoutRepo.GetWorkoutID(userEmail, workoutName)
+	if err != nil {
+		return err
+	}
 	exercise := model.Exercise{
 		WorkoutID: workoutID,
-		Name:      name,
+		Name:      excerciseName,
 		Reps:      reps,
 		Weight:    int(weight),
 	}
