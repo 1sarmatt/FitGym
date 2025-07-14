@@ -35,12 +35,9 @@ func AddWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid date format", http.StatusBadRequest)
 		return
 	}
-	id, err := WorkoutService.AddWorkout(userID, req.WorkoutType, date, req.Duration, req.Notes)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	json.NewEncoder(w).Encode(map[string]string{"workout_id": id.String()})
+	WorkoutService.AddWorkout(userID, req.WorkoutType, date, req.Duration, req.Notes)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "workout added"})
 }
 
 func AddExerciseHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,12 +58,9 @@ func AddExerciseHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid workout_id", http.StatusBadRequest)
 		return
 	}
-	id, err := WorkoutService.AddExercise(workoutID, req.Name, req.Sets, req.Reps, req.Weight)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	json.NewEncoder(w).Encode(map[string]string{"exercise_id": id.String()})
+	WorkoutService.AddExercise(workoutID, req.Name, req.Sets, req.Reps, req.Weight)
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "exercise added"})
 }
 
 func GetWorkoutHistoryHandler(w http.ResponseWriter, r *http.Request) {

@@ -1,7 +1,6 @@
 package serivces
 
 import (
-	"fitgym/backend/repository/model"
 	"fmt"
 	"time"
 
@@ -18,21 +17,19 @@ func NewAnalyticsService(ws *WorkoutService) *AnalyticsService {
 	}
 }
 
-func (as *AnalyticsService) GetWeeklySummary(userID uuid.UUID) []model.Workout {
-	var weeklyWorkouts []model.Workout
+func (as *AnalyticsService) GetWeeklySummary(userID uuid.UUID) []WorkoutWithExercises {
+	summary := make([]WorkoutWithExercises, 0)
 	history, err := as.workoutService.GetWorkoutHistory(userID)
 	if err != nil {
-		return weeklyWorkouts
+		return summary
 	}
-	now := time.Now()
-	year, week := now.ISOWeek()
 	for _, workout := range history {
-		wYear, wWeek := workout.Date.ISOWeek()
-		if wYear == year && wWeek == week {
-			weeklyWorkouts = append(weeklyWorkouts, workout)
+		if time.Since(workout.Workout.Date).Hours() > 7*24 {
+			continue
 		}
+		summary = append(summary, workout)
 	}
-	return weeklyWorkouts
+	return summary
 }
 
 func (as *AnalyticsService) GetProgressCharts(userID uuid.UUID) map[string]int {
@@ -42,7 +39,7 @@ func (as *AnalyticsService) GetProgressCharts(userID uuid.UUID) map[string]int {
 		return progress
 	}
 	for _, workout := range history {
-		year, week := workout.Date.ISOWeek()
+		year, week := workout.Workout.Date.ISOWeek()
 		key := fmt.Sprintf("%d-%02d", year, week)
 		totalReps := 0
 		for _, exercise := range workout.Exercises {

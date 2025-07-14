@@ -11,6 +11,5 @@ type Workout struct {
 	UserID    uuid.UUID `gorm:"type:uuid"`
 	Notes     string
 	Date      time.Time `gorm:"type:date"`
-	Exercises []Exercise
 	Completed bool
 }
