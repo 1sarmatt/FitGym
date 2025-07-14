@@ -44,6 +44,7 @@ func main() {
 	r.Get("/getFriends", handlers.GetFriendsHandler)
 	r.Post("/register", handlers.RegisterUserHandler)
 	r.Post("/login", handlers.LoginUserHandler)
+	r.Post("/refresh", handlers.RefreshTokenHandler)
 
 	// Protected route
 	r.With(internal.JWTAuthMiddleware).Get("/protected", func(w http.ResponseWriter, r *http.Request) {
