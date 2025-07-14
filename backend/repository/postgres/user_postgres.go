@@ -33,6 +33,14 @@ func (r *UserRepository) GetUserByID(id uuid.UUID) (*model.User, error) {
 	return &user, nil
 }
 
+func (r *UserRepository) GetUserIDByEmail(email string) (uuid.UUID, error) {
+	var user model.User
+	if err := r.db.Where("email = ?", email).First(&user).Error; err != nil {
+		return uuid.UUID{}, err
+	}
+	return user.ID, nil
+}
+
 // GetUserByName retrieves a user by their name.
 func (r *UserRepository) GetUserByName(name string) (*model.User, error) {
 	var user model.User

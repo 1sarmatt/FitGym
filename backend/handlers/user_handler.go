@@ -20,11 +20,17 @@ var UserRepo *postgres.UserRepository // Should be initialized in main.go
 
 // Handler for editing user profile
 func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
+	_, ok := r.Context().Value("userEmail").(string)
+	if !ok {
+		http.Error(w, "Unable to get user information", http.StatusUnauthorized)
+		return
+	}
 	type reqBody struct {
 		Name string `json:"name"`
 		Age  int    `json:"age"`
 	}
 	var req reqBody
+
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
 		return

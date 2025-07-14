@@ -26,7 +26,16 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	db.AutoMigrate(&model.User{})
+
+	err = db.AutoMigrate(
+		&model.User{},
+		&model.Workout{},
+		&model.Exercise{},
+		&model.Friend{},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	r := chi.NewRouter()
 
@@ -40,8 +49,9 @@ func main() {
 	r.Post("/addWorkout", handlers.AddWorkoutHandler)
 	r.Post("/addExercise", handlers.AddExerciseHandler)
 	r.Get("/getWorkoutHistory", handlers.GetWorkoutHistoryHandler)
-	r.Post("/addFriend", handlers.AddFriendHandler)
-	r.Get("/getFriends", handlers.GetFriendsHandler)
+	r.With(internal.JWTAuthMiddleware).Post("/addFriend", handlers.AddFriendHandler)
+	r.With(internal.JWTAuthMiddleware).Get("/getFriends", handlers.GetFriendsHandler)
+	r.With(internal.JWTAuthMiddleware).Post("/editProfile", handlers.EditProfileHandler)
 	r.Post("/register", handlers.RegisterUserHandler)
 	r.Post("/login", handlers.LoginUserHandler)
 	r.Post("/refresh", handlers.RefreshTokenHandler)

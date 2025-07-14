@@ -11,7 +11,7 @@ import (
 var jwtSecret = []byte(os.Getenv("JWT_SECRET_KEY"))
 
 type Claims struct {
-	UserID    string `json:"user_id"`
+	Email     string `json:"email"`
 	TokenType string `json:"token_type"` // "access" or "refresh"
 	jwt.RegisteredClaims
 }
@@ -22,13 +22,13 @@ type TokenPair struct {
 }
 
 // GenerateTokenPair creates both access and refresh tokens for a user
-func GenerateTokenPair(userID string) (*TokenPair, error) {
-	accessToken, err := generateToken(userID, "access", 15*time.Minute) // 15 minutes
+func GenerateTokenPair(email string) (*TokenPair, error) {
+	accessToken, err := generateToken(email, "access", 15*time.Minute) // 15 minutes
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := generateToken(userID, "refresh", 5*time.Hour) // 5 hours
+	refreshToken, err := generateToken(email, "refresh", 5*time.Hour) // 5 hours
 	if err != nil {
 		return nil, err
 	}
@@ -40,9 +40,9 @@ func GenerateTokenPair(userID string) (*TokenPair, error) {
 }
 
 // generateToken creates a JWT token with specified type and expiration
-func generateToken(userID, tokenType string, expiration time.Duration) (string, error) {
+func generateToken(email, tokenType string, expiration time.Duration) (string, error) {
 	claims := &Claims{
-		UserID:    userID,
+		Email:     email,
 		TokenType: tokenType,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(expiration)),
@@ -54,8 +54,8 @@ func generateToken(userID, tokenType string, expiration time.Duration) (string, 
 }
 
 // GenerateJWT creates a new JWT token for a user (kept for backward compatibility)
-func GenerateJWT(userID string) (string, error) {
-	return generateToken(userID, "access", 15*time.Minute) // 15 minutes
+func GenerateJWT(email string) (string, error) {
+	return generateToken(email, "access", 15*time.Minute) // 15 minutes
 }
 
 // ValidateJWT parses and validates a JWT token string
@@ -105,5 +105,5 @@ func RefreshAccessToken(refreshTokenStr string) (string, error) {
 	}
 
 	// Generate new access token
-	return generateToken(claims.UserID, "access", 15*time.Minute) // 15 minutes
+	return generateToken(claims.Email, "access", 15*time.Minute) // 15 minutes
 }
