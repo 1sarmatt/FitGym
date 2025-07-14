@@ -3,36 +3,69 @@ package handlers
 import (
 	"encoding/json"
 	"fitgym/backend/repository/postgres"
-
 	"log"
 	"net/http"
-
-	"github.com/google/uuid"
 )
 
 var FriendRepo *postgres.FriendRepository
 
 func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
+
+	userEmail, ok := r.Context().Value("Email").(string)
+	if !ok {
+		http.Error(w, "Unable to get user information", http.StatusUnauthorized)
+		return
+	}
+
 	type reqBody struct {
-		UserID   uuid.UUID `json:"user_id"`
-		FriendID uuid.UUID `json:"friend_id"`
+		Email string `json:"friend_email"`
 	}
 	var req reqBody
 
-	err := FriendRepo.AddFriend(req.UserID, req.FriendID)
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
+		return
+	}
+
+	friendID, err := UserRepo.GetUserIDByEmail(req.Email)
+	userID, err := UserRepo.GetUserIDByEmail(userEmail)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	FriendRepo.AddFriend(userID, friendID)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
-	type reqBody struct {
-		UserID uuid.UUID `json:"user_id"`
+	userEmail, ok := r.Context().Value("Email").(string)
+	if !ok {
+		http.Error(w, "Unable to get user information", http.StatusUnauthorized)
+		return
 	}
-	var req reqBody
-	user, err := FriendRepo.GetFriends(req.UserID)
+	userID, err := UserRepo.GetUserIDByEmail(userEmail)
 	if err != nil {
 		log.Fatal(err)
 	}
-	json.NewEncoder(w).Encode(user)
+
+	users, err := FriendRepo.GetFriends(userID)
+	log.Println(users)
+
+	var arr []string
+	for _, user := range users {
+		curr_user, err := UserRepo.GetUserByID(user.FriendID)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		log.Println(curr_user)
+		arr = append(arr, curr_user.Email)
+	}
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	json.NewEncoder(w).Encode(arr)
 }
