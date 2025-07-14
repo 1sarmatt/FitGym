@@ -23,12 +23,12 @@ type TokenPair struct {
 
 // GenerateTokenPair creates both access and refresh tokens for a user
 func GenerateTokenPair(userID string) (*TokenPair, error) {
-	accessToken, err := generateToken(userID, "access", 24*time.Hour) // 1 day
+	accessToken, err := generateToken(userID, "access", 15*time.Minute) // 15 minutes
 	if err != nil {
 		return nil, err
 	}
 
-	refreshToken, err := generateToken(userID, "refresh", 7*24*time.Hour) // 7 days
+	refreshToken, err := generateToken(userID, "refresh", 5*time.Hour) // 5 hours
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +55,7 @@ func generateToken(userID, tokenType string, expiration time.Duration) (string, 
 
 // GenerateJWT creates a new JWT token for a user (kept for backward compatibility)
 func GenerateJWT(userID string) (string, error) {
-	return generateToken(userID, "access", 24*time.Hour) // 1 day
+	return generateToken(userID, "access", 15*time.Minute) // 15 minutes
 }
 
 // ValidateJWT parses and validates a JWT token string
@@ -105,5 +105,5 @@ func RefreshAccessToken(refreshTokenStr string) (string, error) {
 	}
 
 	// Generate new access token
-	return generateToken(claims.UserID, "access", 24*time.Hour) // 1 day
+	return generateToken(claims.UserID, "access", 15*time.Minute) // 15 minutes
 }
