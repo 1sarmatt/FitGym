@@ -28,6 +28,10 @@ func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	friendID, err := UserRepo.GetUserIDByEmail(req.Email)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	userID, err := UserRepo.GetUserIDByEmail(userEmail)
 	if err != nil {
 		log.Fatal(err)
