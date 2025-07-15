@@ -24,6 +24,20 @@ jobs:
           sudo apt-get update
           sudo apt-get install docker-compose -y
 
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'
+          channel: stable
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: flutter pub get
+
+      - name: Build Flutter Web
+        working-directory: frontend
+        run: flutter build web --base-href="/FitGym/"
+
       - name: Create .env files from example
         run: |
           cp ./backend/.env.example ./backend/.env
@@ -69,14 +83,15 @@ jobs:
         run: |
           curl -s http://localhost | grep -q "<title>" && echo "Frontend page loads" || (echo "Frontend page failed to load" && exit 1)
 
-      - name: Copy Flutter web build from frontend container
-        run: |
-          FRONTEND_CONTAINER=$(docker ps -aqf "name=frontend")
-          docker cp "$FRONTEND_CONTAINER:/app/build/web" ./flutter-web
+      - name: Copy Flutter build output
+        run: cp -r frontend/build/web ./flutter-web
 
       - name: Shutdown containers
         if: always()
         run: docker-compose down -v
+
+      - name: Add 404 fallback for GitHub Pages routing
+        run: cp ./flutter-web/index.html ./flutter-web/404.html
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
