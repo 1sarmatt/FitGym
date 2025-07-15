@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import '../../common/api.dart';
+import 'package:fitgym/l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -58,6 +59,10 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -66,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
               child: Card(
-                color: Colors.grey[850],
+                color: theme.cardColor,
                 elevation: 8,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 child: Padding(
@@ -76,56 +81,51 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.fitness_center, size: 48, color: Colors.orangeAccent),
+                        Icon(Icons.fitness_center, size: 48, color: colorScheme.primary),
                         const SizedBox(height: 16),
-                        Text('Welcome Back!',
-                            style: TextStyle(
-                              color: Colors.orangeAccent,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            )),
+                        Text(localizations.loginWelcome,
+                            style: textTheme.titleLarge?.copyWith(color: colorScheme.primary)),
                         const SizedBox(height: 24),
                         TextFormField(
                           controller: _emailController,
-                          style: const TextStyle(color: Colors.white),
+                          style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
                           decoration: InputDecoration(
-                            labelText: 'Email',
-                            labelStyle: const TextStyle(color: Colors.orangeAccent),
-                            prefixIcon: const Icon(Icons.email, color: Colors.orangeAccent),
+                            labelText: localizations.email,
+                            labelStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.primary),
+                            prefixIcon: Icon(Icons.email, color: colorScheme.primary),
                             filled: true,
-                            fillColor: Colors.grey[800],
+                            fillColor: theme.cardColor,
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.orangeAccent, width: 2),
+                              borderSide: BorderSide(color: colorScheme.primary, width: 2),
                             ),
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
+                              return localizations.enterEmail;
                             }
-                            // Allow any text for testing/demo purposes
                             return null;
                           },
                         ),
                         const SizedBox(height: 20),
                         TextFormField(
                           controller: _passwordController,
-                          style: const TextStyle(color: Colors.white),
+                          style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
                           decoration: InputDecoration(
-                            labelText: 'Password',
-                            labelStyle: const TextStyle(color: Colors.orangeAccent),
-                            prefixIcon: const Icon(Icons.lock, color: Colors.orangeAccent),
+                            labelText: localizations.password,
+                            labelStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.primary),
+                            prefixIcon: Icon(Icons.lock, color: colorScheme.primary),
                             filled: true,
-                            fillColor: Colors.grey[800],
+                            fillColor: theme.cardColor,
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.orangeAccent, width: 2),
+                              borderSide: BorderSide(color: colorScheme.primary, width: 2),
                             ),
                             suffixIcon: IconButton(
-                              icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off, color: Colors.orangeAccent),
+                              icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off, color: colorScheme.primary),
                               onPressed: () {
                                 setState(() => _obscurePassword = !_obscurePassword);
                               },
@@ -134,10 +134,10 @@ class _LoginPageState extends State<LoginPage> {
                           obscureText: _obscurePassword,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
+                              return localizations.enterPassword;
                             }
                             if (value.length < 6) {
-                              return 'Password must be at least 6 characters';
+                              return localizations.passwordMinLength;
                             }
                             return null;
                           },
@@ -147,10 +147,10 @@ class _LoginPageState extends State<LoginPage> {
                           width: double.infinity,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orangeAccent,
-                              foregroundColor: Colors.black,
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
                               padding: const EdgeInsets.symmetric(vertical: 16),
-                              textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              textStyle: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: () {
@@ -158,16 +158,15 @@ class _LoginPageState extends State<LoginPage> {
                                 login();
                               }
                             },
-                            
-                            child: const Text('Login'),
+                            child: Text(localizations.login),
                           ),
                         ),
                         const SizedBox(height: 16),
                         TextButton(
                           onPressed: () => context.go('/register'),
-                          child: const Text('Don\'t have an account? Register', style: TextStyle(color: Colors.orangeAccent)),
+                          child: Text(localizations.noAccountRegister, style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary)),
                         ),
-                        Text(message),
+                        Text(message, style: textTheme.bodyMedium?.copyWith(color: colorScheme.error)),
                       ],
                     ),
                   ),
@@ -178,22 +177,22 @@ class _LoginPageState extends State<LoginPage> {
         ),
       ),
       bottomNavigationBar: NavigationBar(
-        backgroundColor: Colors.grey[900],
-        indicatorColor: Colors.orangeAccent.withOpacity(0.1),
+        backgroundColor: theme.bottomAppBarTheme.color ?? colorScheme.surface,
+        indicatorColor: colorScheme.primary.withOpacity(0.1),
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onNavTap,
-        destinations: const [
+        destinations: [
           NavigationDestination(
             icon: Icon(Icons.home),
-            label: 'Welcome',
+            label: localizations.welcome,
           ),
           NavigationDestination(
             icon: Icon(Icons.login),
-            label: 'Login',
+            label: localizations.login,
           ),
           NavigationDestination(
             icon: Icon(Icons.person_add),
-            label: 'Register',
+            label: localizations.register,
           ),
         ],
       ),

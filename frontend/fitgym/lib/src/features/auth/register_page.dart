@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../common/api.dart';
 import 'dart:convert';
+import 'package:fitgym/l10n/app_localizations.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -61,6 +62,10 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -69,7 +74,7 @@ class _RegisterPageState extends State<RegisterPage> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
               child: Card(
-                color: Colors.grey[850],
+                color: theme.cardColor,
                 elevation: 8,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 child: Padding(
@@ -79,37 +84,33 @@ class _RegisterPageState extends State<RegisterPage> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.person_add, size: 48, color: Colors.orangeAccent),
+                        Icon(Icons.person_add, size: 48, color: colorScheme.primary),
                         const SizedBox(height: 16),
-                        Text('Create Account',
-                            style: TextStyle(
-                              color: Colors.orangeAccent,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            )),
+                        Text(localizations.createAccount,
+                            style: textTheme.titleLarge?.copyWith(color: colorScheme.primary)),
                         const SizedBox(height: 24),
                         TextFormField(
                           controller: _emailController,
-                          style: const TextStyle(color: Colors.white),
+                          style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
                           decoration: InputDecoration(
-                            labelText: 'Email',
-                            labelStyle: const TextStyle(color: Colors.orangeAccent),
-                            prefixIcon: const Icon(Icons.email, color: Colors.orangeAccent),
+                            labelText: localizations.email,
+                            labelStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.primary),
+                            prefixIcon: Icon(Icons.email, color: colorScheme.primary),
                             filled: true,
-                            fillColor: Colors.grey[800],
+                            fillColor: theme.cardColor,
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.orangeAccent, width: 2),
+                              borderSide: BorderSide(color: colorScheme.primary, width: 2),
                             ),
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your email';
+                              return localizations.enterEmail;
                             }
                             if (!RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+').hasMatch(value)) {
-                              return 'Enter a valid email';
+                              return localizations.enterValidEmail;
                             }
                             return null;
                           },
@@ -117,20 +118,20 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 20),
                         TextFormField(
                           controller: _passwordController,
-                          style: const TextStyle(color: Colors.white),
+                          style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
                           decoration: InputDecoration(
-                            labelText: 'Password',
-                            labelStyle: const TextStyle(color: Colors.orangeAccent),
-                            prefixIcon: const Icon(Icons.lock, color: Colors.orangeAccent),
+                            labelText: localizations.password,
+                            labelStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.primary),
+                            prefixIcon: Icon(Icons.lock, color: colorScheme.primary),
                             filled: true,
-                            fillColor: Colors.grey[800],
+                            fillColor: theme.cardColor,
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.orangeAccent, width: 2),
+                              borderSide: BorderSide(color: colorScheme.primary, width: 2),
                             ),
                             suffixIcon: IconButton(
-                              icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off, color: Colors.orangeAccent),
+                              icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off, color: colorScheme.primary),
                               onPressed: () {
                                 setState(() => _obscurePassword = !_obscurePassword);
                               },
@@ -139,10 +140,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           obscureText: _obscurePassword,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
+                              return localizations.enterPassword;
                             }
                             if (value.length < 6) {
-                              return 'Password must be at least 6 characters';
+                              return localizations.passwordMinLength;
                             }
                             return null;
                           },
@@ -150,20 +151,20 @@ class _RegisterPageState extends State<RegisterPage> {
                         const SizedBox(height: 20),
                         TextFormField(
                           controller: _confirmPasswordController,
-                          style: const TextStyle(color: Colors.white),
+                          style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
                           decoration: InputDecoration(
-                            labelText: 'Confirm Password',
-                            labelStyle: const TextStyle(color: Colors.orangeAccent),
-                            prefixIcon: const Icon(Icons.lock_outline, color: Colors.orangeAccent),
+                            labelText: localizations.confirmPassword,
+                            labelStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.primary),
+                            prefixIcon: Icon(Icons.lock_outline, color: colorScheme.primary),
                             filled: true,
-                            fillColor: Colors.grey[800],
+                            fillColor: theme.cardColor,
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.orangeAccent, width: 2),
+                              borderSide: BorderSide(color: colorScheme.primary, width: 2),
                             ),
                             suffixIcon: IconButton(
-                              icon: Icon(_obscureConfirmPassword ? Icons.visibility : Icons.visibility_off, color: Colors.orangeAccent),
+                              icon: Icon(_obscureConfirmPassword ? Icons.visibility : Icons.visibility_off, color: colorScheme.primary),
                               onPressed: () {
                                 setState(() => _obscureConfirmPassword = !_obscureConfirmPassword);
                               },
@@ -172,10 +173,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           obscureText: _obscureConfirmPassword,
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please confirm your password';
+                              return localizations.confirmPasswordPrompt;
                             }
                             if (value != _passwordController.text) {
-                              return 'Passwords do not match';
+                              return localizations.passwordsDoNotMatch;
                             }
                             return null;
                           },
@@ -185,10 +186,10 @@ class _RegisterPageState extends State<RegisterPage> {
                           width: double.infinity,
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orangeAccent,
-                              foregroundColor: Colors.black,
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
                               padding: const EdgeInsets.symmetric(vertical: 16),
-                              textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              textStyle: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: () {
@@ -196,15 +197,15 @@ class _RegisterPageState extends State<RegisterPage> {
                                 register();
                               }
                             },
-                            child: const Text('Register'),
+                            child: Text(localizations.register),
                           ),
                         ),
                         const SizedBox(height: 16),
                         TextButton(
                           onPressed: () => context.go('/login'),
-                          child: const Text('Already have an account? Login', style: TextStyle(color: Colors.orangeAccent)),
+                          child: Text(localizations.alreadyHaveAccountLogin, style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary)),
                         ),
-                        Text(message),
+                        Text(message, style: textTheme.bodyMedium?.copyWith(color: colorScheme.error)),
                       ],
                     ),
                   ),
@@ -215,22 +216,22 @@ class _RegisterPageState extends State<RegisterPage> {
         ),
       ),
       bottomNavigationBar: NavigationBar(
-        backgroundColor: Colors.grey[900],
-        indicatorColor: Colors.orangeAccent.withOpacity(0.1),
+        backgroundColor: theme.bottomAppBarTheme.color ?? colorScheme.surface,
+        indicatorColor: colorScheme.primary.withOpacity(0.1),
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onNavTap,
-        destinations: const [
+        destinations: [
           NavigationDestination(
             icon: Icon(Icons.home),
-            label: 'Welcome',
+            label: localizations.welcome,
           ),
           NavigationDestination(
             icon: Icon(Icons.login),
-            label: 'Login',
+            label: localizations.login,
           ),
           NavigationDestination(
             icon: Icon(Icons.person_add),
-            label: 'Register',
+            label: localizations.register,
           ),
         ],
       ),

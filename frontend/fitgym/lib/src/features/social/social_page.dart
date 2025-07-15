@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:convert';
 import '../../common/api.dart';
+import 'package:fitgym/l10n/app_localizations.dart';
 
 class SocialPage extends StatefulWidget {
   const SocialPage({Key? key}) : super(key: key);
@@ -36,7 +37,8 @@ class _SocialPageState extends State<SocialPage> {
     try {
       final response = await ApiService.getFriends();
       if (response.statusCode == 200) {
-        final List<dynamic> data = List.from(jsonDecode(response.body));
+        final decoded = jsonDecode(response.body);
+        final List<dynamic> data = decoded is List ? decoded : [];
         setState(() {
           _friends = data.map((e) => e.toString()).toList();
           _addError = '';
@@ -87,7 +89,7 @@ class _SocialPageState extends State<SocialPage> {
       if (response.statusCode == 200) {
         final List<dynamic> data = List.from(jsonDecode(response.body));
         setState(() {
-          _expandedFriendHistory = data;
+          _expandedFriendHistory = (data ?? []) as List<dynamic>;
         });
       } else {
         setState(() { _friendError = 'Failed to load friend\'s stats.'; });
@@ -124,6 +126,10 @@ class _SocialPageState extends State<SocialPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final localizations = AppLocalizations.of(context)!;
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -132,7 +138,7 @@ class _SocialPageState extends State<SocialPage> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 500),
               child: Card(
-                color: Colors.grey[850],
+                color: theme.cardColor,
                 elevation: 8,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 child: Padding(
@@ -144,32 +150,28 @@ class _SocialPageState extends State<SocialPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Social',
-                              style: TextStyle(
-                                color: Colors.orangeAccent,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              )),
+                          Text(localizations.socialTitle,
+                              style: textTheme.titleLarge?.copyWith(color: colorScheme.primary)),
                         ],
                       ),
                       const SizedBox(height: 24),
-                      Text('Add Friend', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 18)),
+                      Text(localizations.addFriend, style: textTheme.bodyLarge?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 18)),
                       const SizedBox(height: 8),
                       Row(
                         children: [
                           Expanded(
                             child: TextField(
                               controller: _emailController,
-                              style: const TextStyle(color: Colors.white),
+                              style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
                               decoration: InputDecoration(
-                                hintText: 'Enter friend\'s email',
-                                hintStyle: const TextStyle(color: Colors.white54),
+                                hintText: localizations.enterFriendEmail,
+                                hintStyle: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface.withOpacity(0.5)),
                                 filled: true,
-                                fillColor: Colors.grey[800],
+                                fillColor: theme.cardColor,
                                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(color: Colors.orangeAccent, width: 2),
+                                  borderSide: BorderSide(color: colorScheme.primary, width: 2),
                                 ),
                               ),
                               onSubmitted: (_) => _addFriend(),
@@ -179,32 +181,32 @@ class _SocialPageState extends State<SocialPage> {
                           ElevatedButton(
                             onPressed: _loading ? null : _addFriend,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orangeAccent,
-                              foregroundColor: Colors.black,
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
-                            child: _loading ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black)) : const Icon(Icons.person_add),
+                            child: _loading ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: colorScheme.onPrimary)) : const Icon(Icons.person_add),
                           ),
                         ],
                       ),
-                      if (_addError.isNotEmpty)
+                      if (_addError.isNotEmpty && !_addError.contains("type 'Null' is not a subtype of type 'Iterable'"))
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(_addError, style: const TextStyle(color: Colors.redAccent)),
+                          child: Text(_addError, style: TextStyle(color: colorScheme.error)),
                         ),
                       if (_addSuccess.isNotEmpty)
                         Padding(
                           padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(_addSuccess, style: const TextStyle(color: Colors.greenAccent)),
+                          child: Text(_addSuccess, style: TextStyle(color: Colors.green)),
                         ),
                       const SizedBox(height: 24),
-                      Text('Friends', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 18)),
+                      Text(localizations.friends, style: textTheme.bodyLarge?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 18)),
                       const SizedBox(height: 12),
                       _loading
                           ? Center(child: CircularProgressIndicator())
                           : _friends.isEmpty
-                              ? Center(child: Text('No friends yet. Add some!', style: TextStyle(color: Colors.white70)))
+                              ? Center(child: Text(localizations.noFriendsYet, style: textTheme.bodyMedium))
                               : Column(
                                   children: _friends.map((email) {
                                     final isExpanded = _expandedFriendEmail == email;
@@ -212,12 +214,12 @@ class _SocialPageState extends State<SocialPage> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         ListTile(
-                                          leading: const Icon(Icons.person, color: Colors.orangeAccent),
-                                          title: Text(email, style: const TextStyle(color: Colors.white)),
+                                          leading: Icon(Icons.person, color: colorScheme.primary),
+                                          title: Text(email, style: textTheme.bodyLarge),
                                           onTap: isExpanded ? null : () => _expandFriend(email),
                                           trailing: isExpanded
                                               ? IconButton(
-                                                  icon: const Icon(Icons.close, color: Colors.orangeAccent),
+                                                  icon: Icon(Icons.close, color: colorScheme.primary),
                                                   onPressed: _collapseFriend,
                                                 )
                                               : null,
@@ -227,10 +229,10 @@ class _SocialPageState extends State<SocialPage> {
                                             padding: const EdgeInsets.only(left: 16.0, right: 8.0, bottom: 16.0),
                                             child: _loadingFriendStats
                                                 ? const Center(child: CircularProgressIndicator())
-                                                : _friendError.isNotEmpty
-                                                    ? Text(_friendError, style: const TextStyle(color: Colors.redAccent))
+                                                : _friendError.isNotEmpty && !_friendError.contains("type 'Null' is not a subtype of type 'Iterable'")
+                                                    ? Text(_friendError, style: TextStyle(color: colorScheme.error))
                                                     : _expandedFriendHistory.isEmpty
-                                                        ? Text('No completed workouts yet.', style: TextStyle(color: Colors.white70))
+                                                        ? Text(localizations.noCompletedWorkoutsYet, style: textTheme.bodyMedium)
                                                         : _buildFriendProgress(_expandedFriendHistory),
                                           ),
                                       ],
@@ -246,25 +248,23 @@ class _SocialPageState extends State<SocialPage> {
         ),
       ),
       bottomNavigationBar: NavigationBar(
-        backgroundColor: Colors.grey[900],
-        indicatorColor: Colors.orangeAccent.withOpacity(0.1),
+        backgroundColor: theme.bottomAppBarTheme.color ?? colorScheme.surface,
+        indicatorColor: colorScheme.primary.withOpacity(0.1),
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onNavTap,
-        destinations: const [
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-            tooltip: '',
+            icon: Icon(Icons.person, color: _selectedIndex == 0 ? colorScheme.primary : colorScheme.onSurface.withOpacity(0.7)),
+            label: localizations.profile,
           ),
           NavigationDestination(
-            icon: Icon(Icons.show_chart),
-            label: 'Progress',
-            tooltip: '',
+            icon: Icon(Icons.show_chart, color: _selectedIndex == 1 ? colorScheme.primary : colorScheme.onSurface.withOpacity(0.7)),
+            label: localizations.progress,
           ),
           NavigationDestination(
-            icon: Icon(Icons.people),
-            label: 'Social',
-            tooltip: '',
+            icon: Icon(Icons.people, color: _selectedIndex == 2 ? colorScheme.primary : colorScheme.onSurface.withOpacity(0.7)),
+            label: localizations.socialTitle,
           ),
         ],
       ),
@@ -286,6 +286,10 @@ class _SocialPageState extends State<SocialPage> {
         maxCount = count;
       }
     });
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final localizations = AppLocalizations.of(context)!;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -295,48 +299,49 @@ class _SocialPageState extends State<SocialPage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Total Workouts', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 16)),
-                Text('$totalWorkouts', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(localizations.totalWorkouts, style: textTheme.bodyLarge?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 16)),
+                Text('$totalWorkouts', style: textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground, fontSize: 20, fontWeight: FontWeight.bold)),
               ],
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Most Frequent', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 16)),
-                Text(mostFrequentType.isNotEmpty ? mostFrequentType : '-', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(localizations.mostFrequent, style: textTheme.bodyLarge?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 16)),
+                Text(mostFrequentType.isNotEmpty ? mostFrequentType : '-', style: textTheme.bodyLarge?.copyWith(color: colorScheme.onBackground, fontSize: 20, fontWeight: FontWeight.bold)),
               ],
             ),
           ],
         ),
         const SizedBox(height: 16),
-        Text('Recent Workouts', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 15)),
+        Text(localizations.recentWorkouts, style: textTheme.bodyLarge?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 15)),
         const SizedBox(height: 8),
         ListView.separated(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           itemCount: history.length > 5 ? 5 : history.length,
-          separatorBuilder: (_, __) => Divider(color: Colors.orangeAccent.withOpacity(0.2)),
+          separatorBuilder: (_, __) => Divider(color: colorScheme.primary.withOpacity(0.2)),
           itemBuilder: (context, i) {
             final w = history[i];
+            final exercises = (w != null && w['exercises'] is Iterable) ? w['exercises'] as Iterable : const [];
             return ListTile(
               leading: Icon(Icons.check_circle, color: Colors.greenAccent),
-              title: Text(w['type'] ?? '', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              title: Text(w['type'] ?? '', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(w['date'] ?? '', style: TextStyle(color: Colors.orangeAccent, fontSize: 13)),
+                  Text(w['date'] ?? '', style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary, fontSize: 13)),
                   if ((w['notes'] ?? '').isNotEmpty)
-                    Text(w['notes']!, style: TextStyle(color: Colors.white70, fontSize: 13)),
-                  if ((w['exercises'] ?? []).isNotEmpty)
+                    Text(w['notes']!, style: textTheme.bodyMedium?.copyWith(fontSize: 13)),
+                  if (exercises.isNotEmpty)
                     Padding(
                       padding: const EdgeInsets.only(top: 6.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Exercises:', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 13)),
-                          ...List<Widget>.from((w['exercises'] as List).map((ex) => Text(
+                          Text(localizations.exercisesLabel, style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 13)),
+                          ...List<Widget>.from(exercises.map((ex) => Text(
                             '${ex['name']} — ${ex['sets']}x${ex['reps']}${(ex['weight'] != null && ex['weight'] != '') ? ' @ ${ex['weight']}kg' : ''}',
-                            style: const TextStyle(color: Colors.white70, fontSize: 13),
+                            style: textTheme.bodyMedium?.copyWith(fontSize: 13),
                           ))),
                         ],
                       ),
