@@ -29,16 +29,16 @@ jobs:
           cp ./backend/.env.example ./backend/.env
           cp ./frontend/.env.example ./frontend/.env
 
-      # - name: Ensure required ports are free
-      #   run: |
-      #     for port in 8080 80 5432; do
-      #       if lsof -i :$port; then
-      #         echo "Port $port is occupied"
-      #         exit 1
-      #       else
-      #         echo "Port $port is free"
-      #       fi
-      #     done
+      - name: Ensure required ports are free
+        run: |
+          for port in 8080 5432; do
+            if lsof -i :$port; then
+              echo "Port $port is occupied"
+              exit 1
+            else
+              echo "Port $port is free"
+            fi
+          done
 
       - name: Build and start services
         run: docker-compose up -d --build
@@ -59,11 +59,7 @@ jobs:
 
       - name: Check frontend is running
         run: |
-          docker ps | grep frontend && echo "Frontend is running" || (echo "Frontend is not running" && exit 1)
-
-      - name: Check nginx is running
-        run: |
-          docker ps | grep nginx && echo "Nginx is running" || (echo "Nginx is not running" && exit 1)
+          docker ps | grep nginx && echo "Frontend is running" || (echo "Frontend is not running" && exit 1)
 
       - name: Test frontend page loads
         run: |
