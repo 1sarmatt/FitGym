@@ -15,14 +15,28 @@ func NewFriendRepository(db *gorm.DB) *FriendRepository {
 	return &FriendRepository{db: db}
 }
 
-// AddFriend создает новую запись о дружбе
+// AddFriend создает двустороннюю запись о дружбе
 func (r *FriendRepository) AddFriend(userID, friendID uuid.UUID) error {
-	friendship := &model.Friend{
+	friendship1 := &model.Friend{
 		ID:       uuid.New(),
 		UserID:   userID,
 		FriendID: friendID,
 	}
-	return r.db.Create(friendship).Error
+	friendship2 := &model.Friend{
+		ID:       uuid.New(),
+		UserID:   friendID,
+		FriendID: userID,
+	}
+	// Используем транзакцию для атомарности
+	return r.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Create(friendship1).Error; err != nil {
+			return err
+		}
+		if err := tx.Create(friendship2).Error; err != nil {
+			return err
+		}
+		return nil
+	})
 }
 
 // RemoveFriend удаляет запись о дружбе

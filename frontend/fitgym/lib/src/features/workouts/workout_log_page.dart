@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'workout_model.dart';
+import '../../common/api.dart';
+import 'dart:convert'; // Added for jsonDecode
 
 class WorkoutLogPage extends StatefulWidget {
   const WorkoutLogPage({Key? key}) : super(key: key);
@@ -28,6 +30,14 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
     }
   }
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<WorkoutModel>().fetchWorkouts();
+    });
+  }
+
   void _onNavTap(int index) {
     setState(() => _selectedIndex = index);
     switch (index) {
@@ -38,7 +48,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
         context.go('/workout-log');
         break;
       case 2:
-        context.go('/workout-history');
+        context.go('/progress');
         break;
     }
   }
@@ -307,13 +317,55 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
       },
     );
     if (result != null && result['date']!.isNotEmpty && result['type']!.isNotEmpty) {
-      context.read<WorkoutModel>().addWorkout(result);
+      try {
+        final userId = await ApiService.getUserId();
+        if (userId == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('User ID not found. Please re-login.')),
+          );
+          return;
+        }
+        // Prepare workout data for backend
+        final exercises = (result['exercises'] as List)
+            .map((ex) => {
+                  'name': ex['name'],
+                  'sets': int.tryParse(ex['sets'] ?? '') ?? 0,
+                  'reps': int.tryParse(ex['reps'] ?? '') ?? 0,
+                  'weight': int.tryParse(ex['weight'] ?? '') ?? 0,
+                })
+            .toList();
+        final workoutData = {
+          'user_id': userId,
+          'workout_type': result['type'],
+          'date': _convertDateToBackendFormat(result['date']),
+          'duration': 60, // TODO: replace with actual duration if available
+          'notes': result['notes'] ?? '',
+          'exercises': exercises,
+        };
+        final response = await ApiService.addWorkout(workoutData);
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final responseData = jsonDecode(response.body);
+          final workoutWithId = {
+            ...result,
+            'id': responseData['workout_id'],
+          };
+          await context.read<WorkoutModel>().fetchWorkouts();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to add workout: ${response.body}')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: ${e.toString()}')),
+        );
+      }
     }
   }
 
   void _editWorkout(int index) async {
     final workout = context.read<WorkoutModel>().workouts[index];
-    final dateController = TextEditingController(text: workout['date']);
+    final dateController = TextEditingController(text: formatDate(workout['date'] ?? ''));
     final typeController = TextEditingController(text: workout['type']);
     final notesController = TextEditingController(text: workout['notes']);
     final formKey = GlobalKey<FormState>();
@@ -561,15 +613,46 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                   child: const Text('Cancel', style: TextStyle(color: Colors.orangeAccent)),
                 ),
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     if (formKey.currentState!.validate()) {
-                      Navigator.of(context).pop({
-                        'action': 'update',
-                        'date': dateController.text,
-                        'type': typeController.text,
-                        'notes': notesController.text,
-                        'exercises': exercises,
-                      });
+                      final id = workout['id'];
+                      if (id == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Workout ID not found.')),
+                        );
+                        return;
+                      }
+                      // Convert date to backend format
+                      final backendDate = _convertDateToBackendFormat(dateController.text);
+                      final exercisesForUpdate = exercises
+                          .map((ex) => {
+                                'name': ex['name'],
+                                'sets': int.tryParse(ex['sets'] ?? '') ?? 0,
+                                'reps': int.tryParse(ex['reps'] ?? '') ?? 0,
+                                'weight': int.tryParse(ex['weight'] ?? '') ?? 0,
+                              })
+                          .toList();
+                      final response = await ApiService.updateWorkout(
+                        id: id,
+                        notes: notesController.text,
+                        date: backendDate,
+                        type: typeController.text,
+                        exercises: exercisesForUpdate,
+                      );
+                      if (response.statusCode == 200) {
+                        await context.read<WorkoutModel>().fetchWorkouts();
+                        Navigator.of(context).pop({
+                          'action': 'update',
+                          'date': dateController.text,
+                          'type': typeController.text,
+                          'notes': notesController.text,
+                          'exercises': exercises,
+                        });
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Failed to update workout: ${response.body}')),
+                        );
+                      }
                     }
                   },
                   child: const Text('Save'),
@@ -581,15 +664,8 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
       },
     );
     if (result != null) {
-      if (result['action'] == 'delete') {
-        context.read<WorkoutModel>().deleteWorkout(index);
-      } else if (result['action'] == 'update') {
-        context.read<WorkoutModel>().updateWorkout(index, {
-          'date': result['date'],
-          'type': result['type'],
-          'notes': result['notes'],
-          'exercises': result['exercises'],
-        });
+      if (result['action'] == 'delete' || result['action'] == 'update') {
+        await context.read<WorkoutModel>().fetchWorkouts();
       }
     }
   }
@@ -597,6 +673,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
   @override
   Widget build(BuildContext context) {
     final workouts = context.watch<WorkoutModel>().workouts;
+    final history = context.watch<WorkoutModel>().history;
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -638,58 +715,184 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                         ],
                       ),
                       const SizedBox(height: 24),
-                      workouts.isEmpty
+                      workouts.isEmpty && history.isEmpty
                           ? Center(
                               child: Text('No workouts yet.', style: TextStyle(color: Colors.white70)),
                             )
-                          : ListView.separated(
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: workouts.length,
-                              separatorBuilder: (_, __) => Divider(color: Colors.orangeAccent.withOpacity(0.2)),
-                              itemBuilder: (context, i) {
-                                final w = workouts[i];
-                                return ListTile(
-                                  leading: Icon(Icons.fitness_center, color: Colors.orangeAccent),
-                                  title: Text(w['type'] ?? '', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                                  subtitle: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(w['date'] ?? '', style: TextStyle(color: Colors.orangeAccent, fontSize: 13)),
-                                      if ((w['notes'] ?? '').isNotEmpty)
-                                        Text(w['notes']!, style: TextStyle(color: Colors.white70, fontSize: 13)),
-                                      if ((w['exercises'] ?? []).isNotEmpty)
-                                        Padding(
-                                          padding: const EdgeInsets.only(top: 6.0),
-                                          child: Column(
+                          : Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (workouts.isNotEmpty)
+                                  ...[
+                                    Text('Active Workouts', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 18)),
+                                    ListView.separated(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: workouts.length,
+                                      separatorBuilder: (_, __) => Divider(color: Colors.orangeAccent.withOpacity(0.2)),
+                                      itemBuilder: (context, i) {
+                                        final w = workouts[i];
+                                        return ListTile(
+                                          leading: Icon(Icons.fitness_center, color: Colors.orangeAccent),
+                                          title: Text(w['type'] ?? '', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                          subtitle: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              const Text('Exercises:', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 13)),
-                                              ...List<Widget>.from((w['exercises'] as List).map((ex) => Text(
-                                                '${ex['name']} — ${ex['sets']}x${ex['reps']}${(ex['weight'] != null && ex['weight'] != '') ? ' @ ${ex['weight']}kg' : ''}',
-                                                style: const TextStyle(color: Colors.white70, fontSize: 13),
-                                              ))),
+                                              Text(formatDate(w['date'] ?? ''), style: TextStyle(color: Colors.orangeAccent, fontSize: 13)),
+                                              if ((w['notes'] ?? '').isNotEmpty)
+                                                Text(w['notes']!, style: TextStyle(color: Colors.white70, fontSize: 13)),
+                                              if ((w['exercises'] ?? []).isNotEmpty)
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 6.0),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      const Text('Exercises:', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 13)),
+                                                      ...List<Widget>.from((w['exercises'] as List).map((ex) => Text(
+                                                        '${ex['name']} — ${ex['sets']}x${ex['reps']}${(ex['weight'] != null && ex['weight'] != '') ? ' @ ${ex['weight']}kg' : ''}',
+                                                        style: const TextStyle(color: Colors.white70, fontSize: 13),
+                                                      ))),
+                                                    ],
+                                                  ),
+                                                ),
                                             ],
                                           ),
-                                        ),
-                                    ],
-                                  ),
-                                  onTap: () => _editWorkout(i),
-                                  trailing: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green,
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                      textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                          onTap: () => _editWorkout(i),
+                                          trailing: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.green,
+                                                  foregroundColor: Colors.white,
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                  textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                ),
+                                                onPressed: () async {
+                                                  final workoutId = w['id'];
+                                                  if (workoutId == null) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(content: Text('Workout ID not found.')),
+                                                    );
+                                                    return;
+                                                  }
+                                                  try {
+                                                    final response = await ApiService.completeWorkout(workoutId);
+                                                    if (response.statusCode == 200) {
+                                                      await context.read<WorkoutModel>().fetchWorkouts();
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(content: Text('Workout marked as completed!')),
+                                                      );
+                                                    } else {
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(content: Text('Failed to complete workout: ${response.body}')),
+                                                      );
+                                                    }
+                                                  } catch (e) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(content: Text('Error: ${e.toString()}')),
+                                                    );
+                                                  }
+                                                },
+                                                child: const Text('Done'),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              IconButton(
+                                                icon: Icon(Icons.delete, color: Colors.redAccent),
+                                                onPressed: () async {
+                                                  final workoutId = w['id'];
+                                                  if (workoutId == null) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(
+                                                      SnackBar(content: Text('Workout ID not found.')),
+                                                    );
+                                                    return;
+                                                  }
+                                                  final confirm = await showDialog<bool>(
+                                                    context: context,
+                                                    builder: (context) => AlertDialog(
+                                                      title: const Text('Delete Workout'),
+                                                      content: const Text('Are you sure you want to delete this workout?'),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () => Navigator.of(context).pop(false),
+                                                          child: const Text('Cancel'),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () => Navigator.of(context).pop(true),
+                                                          child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  );
+                                                  if (confirm == true) {
+                                                    try {
+                                                      final response = await ApiService.deleteWorkout(workoutId);
+                                                      if (response.statusCode == 200) {
+                                                        await context.read<WorkoutModel>().fetchWorkouts();
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                          SnackBar(content: Text('Workout deleted!')),
+                                                        );
+                                                      } else {
+                                                        ScaffoldMessenger.of(context).showSnackBar(
+                                                          SnackBar(content: Text('Failed to delete workout: ${response.body}')),
+                                                        );
+                                                      }
+                                                    } catch (e) {
+                                                      ScaffoldMessenger.of(context).showSnackBar(
+                                                        SnackBar(content: Text('Error: ${e.toString()}')),
+                                                      );
+                                                    }
+                                                  }
+                                                },
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
                                     ),
-                                    onPressed: () {
-                                      context.read<WorkoutModel>().completeWorkout(i);
-                                    },
-                                    child: const Text('Done'),
-                                  ),
-                                );
-                              },
+                                    const SizedBox(height: 24),
+                                  ],
+                                if (history.isNotEmpty)
+                                  ...[
+                                    Text('Workout History', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 18)),
+                                    ListView.separated(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      itemCount: history.length,
+                                      separatorBuilder: (_, __) => Divider(color: Colors.orangeAccent.withOpacity(0.2)),
+                                      itemBuilder: (context, i) {
+                                        final w = history[i];
+                                        return ListTile(
+                                          leading: Icon(Icons.history, color: Colors.orangeAccent),
+                                          title: Text(w['type'] ?? '', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                          subtitle: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(formatDate(w['date'] ?? ''), style: TextStyle(color: Colors.orangeAccent, fontSize: 13)),
+                                              if ((w['notes'] ?? '').isNotEmpty)
+                                                Text(w['notes']!, style: TextStyle(color: Colors.white70, fontSize: 13)),
+                                              if ((w['exercises'] ?? []).isNotEmpty)
+                                                Padding(
+                                                  padding: const EdgeInsets.only(top: 6.0),
+                                                  child: Column(
+                                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                                    children: [
+                                                      const Text('Exercises:', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 13)),
+                                                      ...List<Widget>.from((w['exercises'] as List).map((ex) => Text(
+                                                        '${ex['name']} — ${ex['sets']}x${ex['reps']}${(ex['weight'] != null && ex['weight'] != '') ? ' @ ${ex['weight']}kg' : ''}',
+                                                        style: const TextStyle(color: Colors.white70, fontSize: 13),
+                                                      ))),
+                                                    ],
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                              ],
                             ),
                     ],
                   ),
@@ -716,12 +919,31 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
             tooltip: '',
           ),
           NavigationDestination(
-            icon: Icon(Icons.history),
-            label: 'History',
+            icon: Icon(Icons.show_chart),
+            label: 'Progress',
             tooltip: '',
           ),
         ],
       ),
     );
+  }
+}
+
+// Helper to convert DD.MM.YYYY to YYYY-MM-DD
+String _convertDateToBackendFormat(String date) {
+  final parts = date.split('.');
+  if (parts.length == 3) {
+    return "${parts[2]}-${parts[1]}-${parts[0]}";
+  }
+  return date;
+}
+
+// Helper to convert ISO date to DD.MM.YYYY
+String formatDate(String isoDate) {
+  try {
+    final date = DateTime.parse(isoDate);
+    return '${date.day.toString().padLeft(2, '0')}.${date.month.toString().padLeft(2, '0')}.${date.year}';
+  } catch (_) {
+    return isoDate;
   }
 } 

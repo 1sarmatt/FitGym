@@ -20,7 +20,7 @@ var UserRepo *postgres.UserRepository // Should be initialized in main.go
 
 // Handler for editing user profile
 func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
-	_, ok := r.Context().Value("userEmail").(string)
+	_, ok := r.Context().Value("Email").(string)
 	if !ok {
 		http.Error(w, "Unable to get user information", http.StatusUnauthorized)
 		return
@@ -103,4 +103,25 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set(contentTypeHeader, contentTypeJSON)
 	json.NewEncoder(w).Encode(map[string]string{"access_token": newAccessToken})
+}
+
+// Handler for getting user profile
+func GetProfileHandler(w http.ResponseWriter, r *http.Request) {
+	email, ok := r.Context().Value("Email").(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+	user, err := UserRepo.GetUserByEmail(email)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"id": user.ID.String(),
+		"name": user.Name,
+		"email": user.Email,
+		"age": user.Age,
+	})
 }
