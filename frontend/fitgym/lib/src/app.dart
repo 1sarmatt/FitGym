@@ -5,7 +5,6 @@ import 'features/auth/login_page.dart';
 import 'features/auth/register_page.dart';
 import 'features/auth/profile_page.dart';
 import 'features/workouts/workout_log_page.dart';
-import 'features/workouts/workout_history_page.dart';
 import 'features/progress/progress_page.dart';
 import 'features/schedule/schedule_page.dart';
 import 'features/social/social_page.dart';
@@ -69,17 +68,6 @@ class FitGymApp extends StatelessWidget {
           pageBuilder: (context, state) => CustomTransitionPage(
             key: state.pageKey,
             child: const WorkoutLogPage(),
-            transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(
-              opacity: animation,
-              child: child,
-            ),
-          ),
-        ),
-        GoRoute(
-          path: '/workout-history',
-          pageBuilder: (context, state) => CustomTransitionPage(
-            key: state.pageKey,
-            child: const WorkoutHistoryPage(),
             transitionsBuilder: (context, animation, secondaryAnimation, child) => FadeTransition(
               opacity: animation,
               child: child,

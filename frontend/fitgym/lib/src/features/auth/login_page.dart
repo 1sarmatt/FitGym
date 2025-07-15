@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:convert';
+import '../../common/api.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -14,6 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
   int _selectedIndex = 1;
+  String message = '';
 
   @override
   void dispose() {
@@ -26,7 +29,7 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => _selectedIndex = index);
     switch (index) {
       case 0:
-        context.go('/'); // Welcome
+        context.go('/'); 
         break;
       case 1:
         context.go('/login');
@@ -34,6 +37,22 @@ class _LoginPageState extends State<LoginPage> {
       case 2:
         context.go('/register');
         break;
+    }
+  }
+
+  void login() async {
+    final response = await ApiService.login(
+      _emailController.text,
+      _passwordController.text,
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      await ApiService.saveTokens(data['access_token'], data['refresh_token']);
+      await ApiService.saveEmail(_emailController.text);
+      setState(() => message = 'Login successful!');
+      context.go('/profile');
+    } else {
+      setState(() => message = 'Error: ${response.body}');
     }
   }
 
@@ -136,19 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                               // TODO: Implement login logic
-                                // ScaffoldMessenger.of(context).showSnackBar(
-                                //   const SnackBar(content: Text('Logging in...')),
-                                // );
-                                final email = _emailController.text.trim();
-                                final password = _passwordController.text;
-                                if (email == '1' && password == '123456') {
-                                  context.go('/profile', extra: {'name': 'Demo User', 'email': 'demo@email.com'});
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Invalid email or password')),
-                                  );
-                                }
+                                login();
                               }
                             },
                             
@@ -160,6 +167,7 @@ class _LoginPageState extends State<LoginPage> {
                           onPressed: () => context.go('/register'),
                           child: const Text('Don\'t have an account? Register', style: TextStyle(color: Colors.orangeAccent)),
                         ),
+                        Text(message),
                       ],
                     ),
                   ),
