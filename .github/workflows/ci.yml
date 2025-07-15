@@ -6,6 +6,7 @@ on:
       - main
       - feature/devops
       - dev
+      - feature/ci
 
 jobs:
   build-test-deploy:
@@ -27,10 +28,24 @@ jobs:
         run: |
           cp ./backend/.env.example ./backend/.env
           cp ./frontend/.env.example ./frontend/.env
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'
+          channel: stable
+
+      - name: Install dependencies
+        working-directory: frontend/fitgym
+        run: flutter pub get
+
+      - name: Build Flutter Web
+        working-directory: frontend/fitgym
+        run: flutter build web --base-href="/FitGym/"
 
       - name: Ensure required ports are free
         run: |
-          for port in 8080 80 5432; do
+          for port in 8080 5432; do
             if lsof -i :$port; then
               echo "Port $port is occupied"
               exit 1
@@ -58,27 +73,28 @@ jobs:
 
       - name: Check frontend is running
         run: |
-          docker ps | grep frontend && echo "Frontend is running" || (echo "Frontend is not running" && exit 1)
+          docker ps | grep nginx && echo "Frontend is running" || (echo "Frontend is not running" && exit 1)
 
-      - name: Check nginx is running
+      - name: Debug web-build volume
         run: |
-          docker ps | grep nginx && echo "Nginx is running" || (echo "Nginx is not running" && exit 1)
+          docker run --rm -v $(docker volume ls -qf name=web-build):/data alpine ls /data
 
       - name: Test frontend page loads
         run: |
           curl -s http://localhost | grep -q "<title>" && echo "Frontend page loads" || (echo "Frontend page failed to load" && exit 1)
 
-      - name: Copy Flutter web build from frontend container
-        run: |
-          CONTAINER_ID=$(docker ps -qf "name=frontend")
-          docker cp "$CONTAINER_ID:/app/build/web" ./flutter-web
+      - name: Copy Flutter build output
+        run: cp -r frontend/fitgym/build/web ./flutter-web
 
       - name: Shutdown containers
         if: always()
         run: docker-compose down -v
 
-      # - name: Deploy to GitHub Pages
-      #   uses: peaceiris/actions-gh-pages@v4
-      #   with:
-      #     github_token: ${{ secrets.GITHUB_TOKEN }}
-      #     publish_dir: ./flutter-web
+      - name: Add 404 fallback for GitHub Pages routing
+        run: cp ./flutter-web/index.html ./flutter-web/404.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./flutter-web
