@@ -21,6 +21,6 @@ WORKDIR $APP
 
 RUN flutter clean
 RUN flutter pub get
-RUN flutter build web
+RUN flutter build web --base-href="/FitGym/"
 
 CMD ["flutter", "build", "web", "--release"] 
