@@ -24,6 +24,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install docker-compose -y
 
+      - name: Create .env files from example
+        run: |
+          cp ./backend/.env.example ./backend/.env
+          cp ./frontend/.env.example ./frontend/.env
+      
       - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -31,17 +36,12 @@ jobs:
           channel: stable
 
       - name: Install dependencies
-        working-directory: frontend
+        working-directory: frontend/fitgym
         run: flutter pub get
 
       - name: Build Flutter Web
-        working-directory: frontend
+        working-directory: frontend/fitgym
         run: flutter build web --base-href="/FitGym/"
-
-      - name: Create .env files from example
-        run: |
-          cp ./backend/.env.example ./backend/.env
-          cp ./frontend/.env.example ./frontend/.env
 
       - name: Ensure required ports are free
         run: |
