@@ -58,16 +58,24 @@ func main() {
 	handlers.UserHandler = userService
 	handlers.FriendRepo = pg.NewFriendRepository(db)
 	handlers.UserRepo = pg.NewUserRepository(db)
+	handlers.WorkoutRepo = pg.NewWorkoutRepository(db)
+	handlers.ExerciseRepo = pg.NewExerciseRepository(db)
 
 	r.Post("/addWorkout", handlers.AddWorkoutHandler)
 	r.Post("/addExercise", handlers.AddExerciseHandler)
 	r.Get("/getWorkoutHistory", handlers.GetWorkoutHistoryHandler)
 	r.With(internal.JWTAuthMiddleware).Post("/addFriend", handlers.AddFriendHandler)
 	r.With(internal.JWTAuthMiddleware).Get("/getFriends", handlers.GetFriendsHandler)
-	r.With(internal.JWTAuthMiddleware).Post("/editProfile", handlers.EditProfileHandler)
+	r.With(internal.JWTAuthMiddleware).Put("/editProfile", handlers.EditProfileHandler)
+	r.With(internal.JWTAuthMiddleware).Get("/profile", handlers.GetProfileHandler)
 	r.Post("/register", handlers.RegisterUserHandler)
 	r.Post("/login", handlers.LoginUserHandler)
 	r.Post("/refresh", handlers.RefreshTokenHandler)
+	r.Post("/completeWorkout", handlers.CompleteWorkoutHandler)
+	r.With(internal.JWTAuthMiddleware).Get("/getWorkouts", handlers.GetWorkoutsHandler)
+	r.With(internal.JWTAuthMiddleware).Put("/editWorkout", handlers.EditWorkoutHandler)
+	r.With(internal.JWTAuthMiddleware).Delete("/deleteWorkout", handlers.DeleteWorkoutHandler)
+	r.With(internal.JWTAuthMiddleware).Get("/getFriendWorkoutsByEmail", handlers.GetFriendWorkoutsByEmailHandler)
 
 	// Protected route
 	r.With(internal.JWTAuthMiddleware).Get("/protected", func(w http.ResponseWriter, r *http.Request) {

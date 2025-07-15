@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fitgym/src/common/api.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -13,11 +14,23 @@ class _ProfilePageState extends State<ProfilePage> {
   int _selectedIndex = 0;
   String _name = 'John Doe';
   String _email = 'johndoe@email.com';
+  int _age = 25;
 
   @override
   void initState() {
     super.initState();
-    _loadEmail();
+    _loadProfile();
+  }
+
+  void _loadProfile() async {
+    final profile = await ApiService.getProfile();
+    if (profile != null) {
+      setState(() {
+        _name = profile['name'] ?? _name;
+        _email = profile['email'] ?? _email;
+        _age = profile['age'] ?? _age;
+      });
+    }
   }
 
   void _loadEmail() async {
@@ -49,7 +62,7 @@ class _ProfilePageState extends State<ProfilePage> {
         context.go('/workout-log');
         break;
       case 2:
-        context.go('/workout-history');
+        context.go('/progress');
         break;
     }
   }
@@ -90,6 +103,11 @@ class _ProfilePageState extends State<ProfilePage> {
                             color: Colors.white70,
                             fontSize: 16,
                           )),
+                      Text('Age:  $_age',
+                          style: TextStyle(
+                            color: Colors.white70,
+                            fontSize: 16,
+                          )),
                       const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -103,46 +121,87 @@ class _ProfilePageState extends State<ProfilePage> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: () async {
-                              final result = await showDialog<Map<String, String>>(
+                              final result = await showDialog<Map<String, dynamic>>(
                                 context: context,
-                                builder: (context) {
+                                builder: (dialogContext) {
                                   final nameController = TextEditingController(text: _name);
-                                  return AlertDialog(
-                                    backgroundColor: Colors.grey[900],
-                                    title: const Text('Edit Profile', style: TextStyle(color: Colors.orangeAccent)),
-                                    content: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        TextField(
-                                          controller: nameController,
-                                          decoration: const InputDecoration(
-                                            labelText: 'Name',
-                                            labelStyle: TextStyle(color: Colors.orangeAccent),
-                                          ),
-                                          style: const TextStyle(color: Colors.white),
+                                  final ageController = TextEditingController(text: _age > 0 ? _age.toString() : '');
+                                  bool isSaving = false;
+                                  return StatefulBuilder(
+                                    builder: (dialogContext, setDialogState) {
+                                      return AlertDialog(
+                                        backgroundColor: Colors.grey[900],
+                                        title: const Text('Edit Profile', style: TextStyle(color: Colors.orangeAccent)),
+                                        content: Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            TextField(
+                                              controller: nameController,
+                                              decoration: const InputDecoration(
+                                                labelText: 'Name',
+                                                labelStyle: TextStyle(color: Colors.orangeAccent),
+                                              ),
+                                              style: const TextStyle(color: Colors.white),
+                                            ),
+                                            const SizedBox(height: 12),
+                                            TextField(
+                                              controller: ageController,
+                                              decoration: const InputDecoration(
+                                                labelText: 'Age',
+                                                labelStyle: TextStyle(color: Colors.orangeAccent),
+                                              ),
+                                              style: const TextStyle(color: Colors.white),
+                                              keyboardType: TextInputType.number,
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.of(context).pop(),
-                                        child: const Text('Cancel', style: TextStyle(color: Colors.orangeAccent)),
-                                      ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.of(context).pop({
-                                            'name': nameController.text,
-                                          });
-                                        },
-                                        child: const Text('Save'),
-                                      ),
-                                    ],
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.of(dialogContext).pop();
+                                            },
+                                            child: const Text('Cancel', style: TextStyle(color: Colors.orangeAccent)),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: isSaving
+                                                ? null
+                                                : () async {
+                                                    setDialogState(() => isSaving = true);
+                                                    final newName = nameController.text;
+                                                    final newAge = int.tryParse(ageController.text) ?? 0;
+                                                    final response = await ApiService.updateProfile(newName, newAge);
+                                                    setDialogState(() => isSaving = false);
+                                                    if (response.statusCode == 200) {
+                                                      if (dialogContext.mounted) {
+                                                        setState(() {
+                                                          _name = newName;
+                                                          _age = newAge;
+                                                        });
+                                                        Navigator.of(dialogContext).pop({'name': newName, 'age': newAge});
+                                                      }
+                                                    } else {
+                                                      if (dialogContext.mounted) {
+                                                        ScaffoldMessenger.of(dialogContext).showSnackBar(
+                                                          SnackBar(content: Text('Failed to update profile')),
+                                                        );
+                                                        Navigator.of(dialogContext).pop();
+                                                      }
+                                                    }
+                                                  },
+                                            child: isSaving
+                                                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
+                                                : const Text('Save'),
+                                          ),
+                                        ],
+                                      );
+                                    },
                                   );
                                 },
                               );
                               if (result != null) {
                                 setState(() {
                                   _name = result['name'] ?? _name;
+                                  _age = int.tryParse(result['age'].toString()) ?? _age;
                                 });
                               }
                             },
@@ -177,12 +236,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         title: Text('Workout Log', style: TextStyle(color: Colors.white)),
                         trailing: Icon(Icons.arrow_forward_ios, color: Colors.orangeAccent, size: 18),
                         onTap: () => context.go('/workout-log'),
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.history, color: Colors.orangeAccent),
-                        title: Text('Workout History', style: TextStyle(color: Colors.white)),
-                        trailing: Icon(Icons.arrow_forward_ios, color: Colors.orangeAccent, size: 18),
-                        onTap: () => context.go('/workout-history'),
                       ),
                       ListTile(
                         leading: Icon(Icons.show_chart, color: Colors.orangeAccent),
@@ -221,8 +274,8 @@ class _ProfilePageState extends State<ProfilePage> {
             tooltip: '',
           ),
           NavigationDestination(
-            icon: Icon(Icons.history),
-            label: 'History',
+            icon: Icon(Icons.show_chart),
+            label: 'Progress',
             tooltip: '',
           ),
         ],
