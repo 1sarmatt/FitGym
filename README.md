@@ -84,21 +84,4 @@ flutter run -d chrome
 
 ---
 
-## Useful Commands
-- **Format Dart code:**
-  ```bash
-  flutter format .
-  ```
-- **Run tests:**
-  ```bash
-  flutter test
-  ```
-- **Check Go code:**
-  ```bash
-  go fmt ./...
-  go test ./...
-  ```
-
----
-
 
