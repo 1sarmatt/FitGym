@@ -7,10 +7,11 @@ import (
 )
 
 type Workout struct {
-	ID          uuid.UUID `gorm:"type:uuid;primary_key"`
-	UserID      uuid.UUID `gorm:"type:uuid"`
-	WorkoutName string
-	Notes       string
-	Date        time.Time `gorm:"type:date"`
-	Completed   bool
+	ID         uuid.UUID   `gorm:"type:uuid;primary_key" json:"id"`
+	UserID     uuid.UUID   `gorm:"type:uuid" json:"user_id"`
+	Notes      string      `json:"notes"`
+	Date       time.Time   `gorm:"type:date" json:"date"`
+	Exercises  []Exercise  `json:"exercises"`
+	Completed  bool        `json:"completed"`
+	WorkoutType string     `json:"type"`
 }

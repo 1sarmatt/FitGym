@@ -29,18 +29,23 @@ func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 
 	friendID, err := UserRepo.GetUserIDByEmail(req.Email)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, "Friend user not found", http.StatusNotFound)
+		return
 	}
 
 	userID, err := UserRepo.GetUserIDByEmail(userEmail)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, "Current user not found", http.StatusNotFound)
+		return
 	}
 
-	FriendRepo.AddFriend(userID, friendID)
+	err = FriendRepo.AddFriend(userID, friendID)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, "Failed to add friend", http.StatusInternalServerError)
+		return
 	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "friend added"})
 }
 
 func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
@@ -51,25 +56,27 @@ func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	userID, err := UserRepo.GetUserIDByEmail(userEmail)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, "Current user not found", http.StatusNotFound)
+		return
 	}
 
 	users, err := FriendRepo.GetFriends(userID)
+	if err != nil {
+		http.Error(w, "Failed to get friends", http.StatusInternalServerError)
+		return
+	}
 	log.Println(users)
 
 	var arr []string
 	for _, user := range users {
 		curr_user, err := UserRepo.GetUserByID(user.FriendID)
 		if err != nil {
-			log.Fatal(err)
+			continue // skip this friend if not found
 		}
 
 		log.Println(curr_user)
 		arr = append(arr, curr_user.Email)
 	}
 
-	if err != nil {
-		log.Fatal(err)
-	}
 	json.NewEncoder(w).Encode(arr)
 }

@@ -20,7 +20,7 @@ var UserRepo *postgres.UserRepository // Should be initialized in main.go
 
 // Handler for editing user profile
 func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
-	_, ok := r.Context().Value("userEmail").(string)
+	_, ok := r.Context().Value("Email").(string)
 	if !ok {
 		http.Error(w, "Unable to get user information", http.StatusUnauthorized)
 		return
@@ -117,23 +117,26 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"access_token": newAccessToken})
 }
 
-// Handler to get user ID from context (assuming userEmail is set by JWT middleware)
-func GetUserIDHandler(w http.ResponseWriter, r *http.Request) {
-	if UserRepo == nil {
-		http.Error(w, "Server configuration error", http.StatusInternalServerError)
+// Handler for getting user profile
+func GetProfileHandler(w http.ResponseWriter, r *http.Request) {
+	email, ok := r.Context().Value("Email").(string)
+	if !ok {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	userEmail := r.URL.Query().Get("user_email")
-	if userEmail == "" {
-		http.Error(w, "Unable to get user email from context", http.StatusUnauthorized)
-		return
-	}
-	// Find user by email
-	user, err := UserRepo.GetUserByEmail(userEmail)
+	user, err := UserRepo.GetUserByEmail(email)
+
 	if err != nil {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
-	w.Header().Set(contentTypeHeader, contentTypeJSON)
-	json.NewEncoder(w).Encode(map[string]interface{}{"user_id": user.ID})
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"id": user.ID.String(),
+		"name": user.Name,
+		"email": user.Email,
+		"age": user.Age,
+	})
 }
+

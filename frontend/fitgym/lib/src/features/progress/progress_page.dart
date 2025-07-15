@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'dart:convert';
 import '../workouts/workout_model.dart';
 
 class ProgressPage extends StatefulWidget {
@@ -17,10 +18,10 @@ class _ProgressPageState extends State<ProgressPage> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final location = GoRouter.of(context).location;
-    int idx = 1;
+    int idx = 0;
     if (location == '/profile') idx = 0;
-    else if (location == '/progress') idx = 1;
-    else if (location == '/workout-history') idx = 2;
+    else if (location == '/workout-log') idx = 1;
+    else if (location == '/progress') idx = 2;
     if (_selectedIndex != idx) {
       setState(() {
         _selectedIndex = idx;
@@ -35,10 +36,10 @@ class _ProgressPageState extends State<ProgressPage> {
         context.go('/profile');
         break;
       case 1:
-        context.go('/progress');
+        context.go('/workout-log');
         break;
       case 2:
-        context.go('/workout-history');
+        context.go('/progress');
         break;
     }
   }
@@ -170,13 +171,13 @@ class _ProgressPageState extends State<ProgressPage> {
             tooltip: '',
           ),
           NavigationDestination(
-            icon: Icon(Icons.show_chart),
-            label: 'Progress',
+            icon: Icon(Icons.fitness_center),
+            label: 'Workout Log',
             tooltip: '',
           ),
           NavigationDestination(
-            icon: Icon(Icons.history),
-            label: 'History',
+            icon: Icon(Icons.show_chart),
+            label: 'Progress',
             tooltip: '',
           ),
         ],
