@@ -41,10 +41,12 @@ func main() {
 
 	workoutService := serivces.NewWorkoutService()
 	userService := serivces.NewUserService()
+	analyticsService := serivces.NewAnalyticsService(workoutService)
 	handlers.WorkoutService = workoutService
 	handlers.UserHandler = userService
 	handlers.FriendRepo = pg.NewFriendRepository(db)
 	handlers.UserRepo = pg.NewUserRepository(db)
+	handlers.AnalyticsSrv = analyticsService
 
 	r.With(internal.JWTAuthMiddleware).Post("/addWorkout", handlers.AddWorkoutHandler)
 	r.With(internal.JWTAuthMiddleware).Post("/addExercise", handlers.AddExerciseHandler)
@@ -52,6 +54,8 @@ func main() {
 	r.With(internal.JWTAuthMiddleware).Post("/addFriend", handlers.AddFriendHandler)
 	r.With(internal.JWTAuthMiddleware).Get("/getFriends", handlers.GetFriendsHandler)
 	r.With(internal.JWTAuthMiddleware).Post("/editProfile", handlers.EditProfileHandler)
+	r.With(internal.JWTAuthMiddleware).Get("/getWeeklySummary", handlers.GetWeeklySummaryHandler)
+	r.With(internal.JWTAuthMiddleware).Get("/getWeeklyCharts", handlers.GetProgressChartsHandler)
 	r.Post("/register", handlers.RegisterUserHandler)
 	r.Post("/login", handlers.LoginUserHandler)
 	r.Post("/refresh", handlers.RefreshTokenHandler)
