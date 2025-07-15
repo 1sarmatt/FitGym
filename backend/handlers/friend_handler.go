@@ -32,7 +32,6 @@ func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Friend user not found", http.StatusNotFound)
 		return
 	}
-
 	userID, err := UserRepo.GetUserIDByEmail(userEmail)
 	if err != nil {
 		http.Error(w, "Current user not found", http.StatusNotFound)
