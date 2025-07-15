@@ -84,7 +84,7 @@ jobs:
           curl -s http://localhost | grep -q "<title>" && echo "Frontend page loads" || (echo "Frontend page failed to load" && exit 1)
 
       - name: Copy Flutter build output
-        run: cp -r frontend/build/web ./flutter-web
+        run: cp -r frontend/fitgym/build/web ./flutter-web
 
       - name: Shutdown containers
         if: always()
