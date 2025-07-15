@@ -35,6 +35,10 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
 		return
 	}
+	if UserHandler == nil || UserRepo == nil {
+		http.Error(w, "Server configuration error", http.StatusInternalServerError)
+		return
+	}
 	ok, err := UserHandler.EditProfile(req.Name, req.Age, *UserRepo)
 	if err != nil || !ok {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -55,6 +59,10 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
 		return
 	}
+	if UserHandler == nil || UserRepo == nil {
+		http.Error(w, "Server configuration error", http.StatusInternalServerError)
+		return
+	}
 	tokenPair, err := UserHandler.Register(req.Email, req.Password, *UserRepo)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -73,6 +81,10 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	var req reqBody
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
+		return
+	}
+	if UserHandler == nil || UserRepo == nil {
+		http.Error(w, "Server configuration error", http.StatusInternalServerError)
 		return
 	}
 	tokenPair, err := UserHandler.Login(req.Email, req.Password, *UserRepo)
@@ -103,4 +115,25 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set(contentTypeHeader, contentTypeJSON)
 	json.NewEncoder(w).Encode(map[string]string{"access_token": newAccessToken})
+}
+
+// Handler to get user ID from context (assuming userEmail is set by JWT middleware)
+func GetUserIDHandler(w http.ResponseWriter, r *http.Request) {
+	if UserRepo == nil {
+		http.Error(w, "Server configuration error", http.StatusInternalServerError)
+		return
+	}
+	userEmail := r.URL.Query().Get("user_email")
+	if userEmail == "" {
+		http.Error(w, "Unable to get user email from context", http.StatusUnauthorized)
+		return
+	}
+	// Find user by email
+	user, err := UserRepo.GetUserByEmail(userEmail)
+	if err != nil {
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+	w.Header().Set(contentTypeHeader, contentTypeJSON)
+	json.NewEncoder(w).Encode(map[string]interface{}{"user_id": user.ID})
 }

@@ -56,6 +56,7 @@ func main() {
 	r.With(internal.JWTAuthMiddleware).Post("/editProfile", handlers.EditProfileHandler)
 	r.With(internal.JWTAuthMiddleware).Get("/getWeeklySummary", handlers.GetWeeklySummaryHandler)
 	r.With(internal.JWTAuthMiddleware).Get("/getWeeklyCharts", handlers.GetProgressChartsHandler)
+	r.With(internal.JWTAuthMiddleware).Get("/getUserID", handlers.GetUserIDHandler)
 	r.Post("/register", handlers.RegisterUserHandler)
 	r.Post("/login", handlers.LoginUserHandler)
 	r.Post("/refresh", handlers.RefreshTokenHandler)
