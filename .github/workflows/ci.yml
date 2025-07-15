@@ -61,6 +61,10 @@ jobs:
         run: |
           docker ps | grep nginx && echo "Frontend is running" || (echo "Frontend is not running" && exit 1)
 
+      - name: Debug web-build volume
+        run: |
+          docker run --rm -v $(docker volume ls -qf name=web-build):/data alpine ls /data
+
       - name: Test frontend page loads
         run: |
           curl -s http://localhost | grep -q "<title>" && echo "Frontend page loads" || (echo "Frontend page failed to load" && exit 1)
@@ -68,7 +72,7 @@ jobs:
       - name: Copy Flutter web build from frontend container
         run: |
           CONTAINER_ID=$(docker ps -qf "name=nginx")
-          docker cp "$CONTAINER_ID:/usr/share/nginx/html:ro" ./flutter-web
+          docker cp "$CONTAINER_ID:/usr/share/nginx/html" ./flutter-web
 
       - name: Shutdown containers
         if: always()
