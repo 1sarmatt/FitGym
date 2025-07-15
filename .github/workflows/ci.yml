@@ -67,7 +67,7 @@ jobs:
 
       - name: Copy Flutter web build from frontend container
         run: |
-          CONTAINER_ID=$(docker ps -qf "name=frontend")
+          CONTAINER_ID=$(docker ps -qf "name=nginx")
           docker cp "$CONTAINER_ID:/app/build/web" ./flutter-web
 
       - name: Shutdown containers
