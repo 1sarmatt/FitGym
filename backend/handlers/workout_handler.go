@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"time"
 
@@ -11,7 +10,6 @@ import (
 	"fitgym/backend/repository/postgres"
 
 	"github.com/google/uuid"
-
 )
 
 var WorkoutService *serivces.WorkoutService
@@ -19,7 +17,6 @@ var WorkoutRepo *postgres.WorkoutRepository
 var ExerciseRepo *postgres.ExerciseRepository
 
 func AddWorkoutHandler(w http.ResponseWriter, r *http.Request) {
-
 	type exerciseReq struct {
 		Name   string  `json:"name"`
 		Sets   int     `json:"sets"`
@@ -33,18 +30,13 @@ func AddWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		Duration    int           `json:"duration"`
 		Notes       string        `json:"notes"`
 		Exercises   []exerciseReq `json:"exercises"`
-
 	}
 	var req reqBody
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
-	userID, err := UserRepo.GetUserIDByEmail(userEmail)
-	if err != nil {
-		log.Fatal(err)
-	}
+	userID, err := uuid.Parse(req.UserID)
 	if err != nil {
 		http.Error(w, "Invalid user_id", http.StatusBadRequest)
 		return
@@ -54,7 +46,6 @@ func AddWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid date format", http.StatusBadRequest)
 		return
 	}
-
 	// Save to database
 	workout := &model.Workout{
 		UserID:    userID,
@@ -87,28 +78,29 @@ func AddWorkoutHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func AddExerciseHandler(w http.ResponseWriter, r *http.Request) {
-
-	userEmail, ok := r.Context().Value("Email").(string)
-	if !ok {
-		http.Error(w, "Unable to get user information", http.StatusUnauthorized)
-		return
-	}
 	type reqBody struct {
-		WorkoutName   string  `json:"workout_name"`
-		ExcerciseName string  `json:"excercise_name"`
-		Sets          int     `json:"sets"`
-		Reps          int     `json:"reps"`
-		Weight        float32 `json:"weight"`
+		WorkoutID string  `json:"workout_id"`
+		Name      string  `json:"name"`
+		Sets      int     `json:"sets"`
+		Reps      int     `json:"reps"`
+		Weight    float32 `json:"weight"`
 	}
 	var req reqBody
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
-
-	WorkoutService.AddExercise(userEmail, req.WorkoutName, req.ExcerciseName, req.Sets, req.Reps, req.Weight)
-	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(map[string]string{"status": "exercise added"})
+	workoutID, err := uuid.Parse(req.WorkoutID)
+	if err != nil {
+		http.Error(w, "Invalid workout_id", http.StatusBadRequest)
+		return
+	}
+	id, err := WorkoutService.AddExercise(workoutID, req.Name, req.Sets, req.Reps, req.Weight)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	json.NewEncoder(w).Encode(map[string]string{"exercise_id": id.String()})
 }
 
 func GetWorkoutHistoryHandler(w http.ResponseWriter, r *http.Request) {
@@ -407,6 +399,5 @@ func DeleteWorkoutHandler(w http.ResponseWriter, r *http.Request) {
     }
     w.WriteHeader(http.StatusOK)
     json.NewEncoder(w).Encode(map[string]string{"status": "deleted"})
-
 }
 // Register this handler in main.go: r.With(internal.JWTAuthMiddleware).Delete("/deleteWorkout", handlers.DeleteWorkoutHandler)

@@ -54,14 +54,12 @@ func main() {
 
 	workoutService := serivces.NewWorkoutService()
 	userService := serivces.NewUserService()
-	analyticsService := serivces.NewAnalyticsService(workoutService)
 	handlers.WorkoutService = workoutService
 	handlers.UserHandler = userService
 	handlers.FriendRepo = pg.NewFriendRepository(db)
 	handlers.UserRepo = pg.NewUserRepository(db)
 	handlers.WorkoutRepo = pg.NewWorkoutRepository(db)
 	handlers.ExerciseRepo = pg.NewExerciseRepository(db)
-	handlers.AnalyticsSrv = analyticsService
 
 	r.With(internal.JWTAuthMiddleware).Post("/addWorkout", handlers.AddWorkoutHandler)
 	r.With(internal.JWTAuthMiddleware).Post("/addExercise", handlers.AddExerciseHandler)
@@ -72,9 +70,6 @@ func main() {
 	r.With(internal.JWTAuthMiddleware).Put("/editProfile", handlers.EditProfileHandler)
 	r.With(internal.JWTAuthMiddleware).Get("/profile", handlers.GetProfileHandler)
 
-	r.With(internal.JWTAuthMiddleware).Get("/getWeeklySummary", handlers.GetWeeklySummaryHandler)
-	r.With(internal.JWTAuthMiddleware).Get("/getWeeklyCharts", handlers.GetProgressChartsHandler)
-	r.With(internal.JWTAuthMiddleware).Get("/getUserID", handlers.GetUserIDHandler)
 
 	r.Post("/register", handlers.RegisterUserHandler)
 	r.Post("/login", handlers.LoginUserHandler)

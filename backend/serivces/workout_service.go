@@ -2,103 +2,95 @@ package serivces
 
 import (
 	"fitgym/backend/repository/model"
-	"fitgym/backend/repository/postgres"
-	"sort"
 	"time"
 
 	"github.com/google/uuid"
 )
 
-var WorkoutRepo *postgres.WorkoutRepository
-var ExerciseRepo *postgres.ExerciseRepository
-
 type WorkoutService struct {
-	workout model.Workout
-}
-
-type WorkoutWithExercises struct {
-	Workout   model.Workout
-	Exercises []model.Exercise
+	workouts  map[uuid.UUID]model.Workout
+	exercises map[uuid.UUID]model.Exercise
 }
 
 func NewWorkoutService() *WorkoutService {
 	return &WorkoutService{
-		workout: model.Workout{},
+		workouts:  make(map[uuid.UUID]model.Workout),
+		exercises: make(map[uuid.UUID]model.Exercise),
 	}
 }
 
-func (ws *WorkoutService) AddWorkout(userID uuid.UUID, workoutName string, date time.Time, duration int, notes string) error {
+func (ws *WorkoutService) AddWorkout(userID uuid.UUID, workoutType string, date time.Time, duration int, notes string) (uuid.UUID, error) {
+	id := uuid.New()
 
-	if workoutName == "" {
-		return ErrorWorkoutTypeEmpty
+	if userID == uuid.Nil {
+		return uuid.Nil, ErrorUserID
+	}
+
+	if workoutType == "" {
+		return uuid.Nil, ErrorWorkoutTypeEmpty
 	}
 
 	if duration < 1 {
-		return ErrorDuration
+		return uuid.Nil, ErrorDuration
 	}
 
 	workout := model.Workout{
-		UserID:      userID,
-		WorkoutName: workoutName,
-		Date:        date,
-		Notes:       notes,
-		Completed:   false,
+		ID:        id,
+		UserID:    userID,
+		Date:      date,
+		Notes:     notes,
+		Completed: false,
+		Exercises: []model.Exercise{},
 	}
-	WorkoutRepo.CreateWorkout(&workout)
-	return nil
+	ws.workouts[id] = workout
+	return id, nil
 }
 
-func (ws *WorkoutService) AddExercise(userEmail, workoutName string, excerciseName string, sets, reps int, weight float32) error {
+func (ws *WorkoutService) AddExercise(workoutID uuid.UUID, name string, sets, reps int, weight float32) (uuid.UUID, error) {
+	id := uuid.New()
 
-	if workoutName == "" {
-		return ErrorWorkoutNameEmpty
+	if workoutID == uuid.Nil {
+		return uuid.Nil, ErrorWorkoutID
 	}
+
+	if name == "" {
+		return uuid.Nil, ErrorWorkoutNameEmpty
+	}
+
 	if sets < 1 || reps < 1 {
-		return ErrorSetsReps
-	}
-	if weight < 0 {
-		return ErrorWeight
+		return uuid.Nil, ErrorSetsReps
 	}
 
-	workoutID, err := WorkoutRepo.GetWorkoutID(userEmail, workoutName)
-	if err != nil {
-		return err
+	if weight < 0 {
+		return uuid.Nil, ErrorWeight
 	}
+
 	exercise := model.Exercise{
+		ID:        id,
 		WorkoutID: workoutID,
-		Name:      excerciseName,
+		Name:      name,
 		Reps:      reps,
 		Weight:    int(weight),
 	}
-	ExerciseRepo.CreateExercise(&exercise)
-	return nil
+	ws.exercises[id] = exercise
+	if workout, ok := ws.workouts[workoutID]; ok {
+		workout.Exercises = append(workout.Exercises, exercise)
+		ws.workouts[workoutID] = workout
+	}
+	return id, nil
 }
 
-func (ws *WorkoutService) GetWorkoutHistory(userID uuid.UUID) ([]WorkoutWithExercises, error) {
+func (ws *WorkoutService) GetWorkoutHistory(userID uuid.UUID) ([]model.Workout, error) {
 
 	if userID == uuid.Nil {
 		return nil, ErrorUserID
 	}
 
-	var history []WorkoutWithExercises
-	var workouts []model.Workout
-	workouts, err := WorkoutRepo.GetWorkoutsByUserID(userID)
-	if err != nil {
-		return nil, err
-	}
-	for _, workout := range workouts {
-		exercises, err := ExerciseRepo.GetExercisesByWorkoutID(workout.ID)
-		if err != nil {
-			return nil, err
+	var history []model.Workout
+	for _, workout := range ws.workouts {
+		if workout.UserID == userID {
+			history = append(history, workout)
 		}
-		history = append(history, WorkoutWithExercises{
-			Workout:   workout,
-			Exercises: exercises,
-		})
 	}
-	sort.Slice(history, func(i, j int) bool {
-		return history[i].Workout.Date.After(history[j].Workout.Date)
-	})
-
 	return history, nil
 }

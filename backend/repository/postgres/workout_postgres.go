@@ -30,13 +30,13 @@ func (r *WorkoutRepository) GetWorkoutsByUserID(id uuid.UUID) ([]model.Workout, 
 	return workouts, nil
 }
 
-func (r *WorkoutRepository) GetWorkoutID(userEmail, workoutName string) (uuid.UUID, error) {
+func (r *WorkoutRepository) GetWorkoutID(userEmail, WorkoutType string) (uuid.UUID, error) {
 	var workout model.Workout
 	userID, err := UserRepo.GetUserIDByEmail(userEmail)
 	if err != nil {
 		return uuid.UUID{}, err
 	}
-	if err := r.db.Where("user_id = ? AND name = ?", userID, workoutName).First(&workout).Error; err != nil {
+	if err := r.db.Where("user_id = ? AND name = ?", userID, WorkoutType).First(&workout).Error; err != nil {
 		return uuid.UUID{}, err
 	}
 	return workout.ID, nil
