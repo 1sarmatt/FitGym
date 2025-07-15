@@ -35,6 +35,10 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
 		return
 	}
+	if UserHandler == nil || UserRepo == nil {
+		http.Error(w, "Server configuration error", http.StatusInternalServerError)
+		return
+	}
 	ok, err := UserHandler.EditProfile(req.Name, req.Age, *UserRepo)
 	if err != nil || !ok {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -55,6 +59,10 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
 		return
 	}
+	if UserHandler == nil || UserRepo == nil {
+		http.Error(w, "Server configuration error", http.StatusInternalServerError)
+		return
+	}
 	tokenPair, err := UserHandler.Register(req.Email, req.Password, *UserRepo)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -73,6 +81,10 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	var req reqBody
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
+		return
+	}
+	if UserHandler == nil || UserRepo == nil {
+		http.Error(w, "Server configuration error", http.StatusInternalServerError)
 		return
 	}
 	tokenPair, err := UserHandler.Login(req.Email, req.Password, *UserRepo)
@@ -113,10 +125,12 @@ func GetProfileHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	user, err := UserRepo.GetUserByEmail(email)
+
 	if err != nil {
 		http.Error(w, "User not found", http.StatusNotFound)
 		return
 	}
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"id": user.ID.String(),
@@ -125,3 +139,4 @@ func GetProfileHandler(w http.ResponseWriter, r *http.Request) {
 		"age": user.Age,
 	})
 }
+
