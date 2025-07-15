@@ -16,6 +16,19 @@ import (
 	"gorm.io/gorm"
 )
 
+func withCORS(h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+		h.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 	// Load environment variables
 	if err := godotenv.Load(); err != nil {
@@ -45,16 +58,24 @@ func main() {
 	handlers.UserHandler = userService
 	handlers.FriendRepo = pg.NewFriendRepository(db)
 	handlers.UserRepo = pg.NewUserRepository(db)
+	handlers.WorkoutRepo = pg.NewWorkoutRepository(db)
+	handlers.ExerciseRepo = pg.NewExerciseRepository(db)
 
 	r.Post("/addWorkout", handlers.AddWorkoutHandler)
 	r.Post("/addExercise", handlers.AddExerciseHandler)
 	r.Get("/getWorkoutHistory", handlers.GetWorkoutHistoryHandler)
 	r.With(internal.JWTAuthMiddleware).Post("/addFriend", handlers.AddFriendHandler)
 	r.With(internal.JWTAuthMiddleware).Get("/getFriends", handlers.GetFriendsHandler)
-	r.With(internal.JWTAuthMiddleware).Post("/editProfile", handlers.EditProfileHandler)
+	r.With(internal.JWTAuthMiddleware).Put("/editProfile", handlers.EditProfileHandler)
+	r.With(internal.JWTAuthMiddleware).Get("/profile", handlers.GetProfileHandler)
 	r.Post("/register", handlers.RegisterUserHandler)
 	r.Post("/login", handlers.LoginUserHandler)
 	r.Post("/refresh", handlers.RefreshTokenHandler)
+	r.Post("/completeWorkout", handlers.CompleteWorkoutHandler)
+	r.With(internal.JWTAuthMiddleware).Get("/getWorkouts", handlers.GetWorkoutsHandler)
+	r.With(internal.JWTAuthMiddleware).Put("/editWorkout", handlers.EditWorkoutHandler)
+	r.With(internal.JWTAuthMiddleware).Delete("/deleteWorkout", handlers.DeleteWorkoutHandler)
+	r.With(internal.JWTAuthMiddleware).Get("/getFriendWorkoutsByEmail", handlers.GetFriendWorkoutsByEmailHandler)
 
 	// Protected route
 	r.With(internal.JWTAuthMiddleware).Get("/protected", func(w http.ResponseWriter, r *http.Request) {
@@ -66,5 +87,5 @@ func main() {
 		port = "8080"
 	}
 	log.Printf("Server running on :%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, r))
+	log.Fatal(http.ListenAndServe(":"+port, withCORS(r)))
 }

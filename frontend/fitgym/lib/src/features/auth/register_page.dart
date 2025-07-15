@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../common/api.dart';
+import 'dart:convert';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -16,6 +18,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   int _selectedIndex = 2;
+  String message = '';
 
   @override
   void dispose() {
@@ -37,6 +40,22 @@ class _RegisterPageState extends State<RegisterPage> {
       case 2:
         context.go('/register');
         break;
+    }
+  }
+
+  void register() async {
+    final response = await ApiService.register(
+      _emailController.text,
+      _passwordController.text,
+    );
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      await ApiService.saveTokens(data['access_token'], data['refresh_token']);
+      await ApiService.saveEmail(_emailController.text);
+      setState(() => message = 'Registration successful!');
+      context.go('/profile');
+    } else {
+      setState(() => message = 'Error: \n${response.body}');
     }
   }
 
@@ -174,10 +193,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                             onPressed: () {
                               if (_formKey.currentState!.validate()) {
-                                // TODO: Implement registration logic
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Registering...')),
-                                );
+                                register();
                               }
                             },
                             child: const Text('Register'),
@@ -188,6 +204,7 @@ class _RegisterPageState extends State<RegisterPage> {
                           onPressed: () => context.go('/login'),
                           child: const Text('Already have an account? Login', style: TextStyle(color: Colors.orangeAccent)),
                         ),
+                        Text(message),
                       ],
                     ),
                   ),
