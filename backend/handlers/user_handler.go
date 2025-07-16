@@ -15,21 +15,45 @@ const (
 	contentTypeHeader     = "Content-Type"
 )
 
+// UserCredentials represents user login/registration request
+type UserCredentials struct {
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+// EditProfileRequest represents profile update request
+type EditProfileRequest struct {
+	Name string `json:"name"`
+	Age  int    `json:"age"`
+}
+
+// RefreshTokenRequest represents refresh token request
+type RefreshTokenRequest struct {
+	RefreshToken string `json:"refresh_token"`
+}
+
 var UserHandler *serivces.User_Service
 var UserRepo *postgres.UserRepository // Should be initialized in main.go
 
-// Handler for editing user profile
+// EditProfileHandler godoc
+// @Summary Edit user profile
+// @Description Updates the profile of the authenticated user
+// @Tags user
+// @Accept  json
+// @Produce  json
+// @Param   profile  body  EditProfileRequest  true  "Profile info"
+// @Success 200 {object} map[string]string
+// @Failure 400 {string} string "Invalid request body"
+// @Failure 401 {string} string "Unauthorized"
+// @Router /editProfile [put]
+// @Security BearerAuth
 func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 	_, ok := r.Context().Value("Email").(string)
 	if !ok {
 		http.Error(w, "Unable to get user information", http.StatusUnauthorized)
 		return
 	}
-	type reqBody struct {
-		Name string `json:"name"`
-		Age  int    `json:"age"`
-	}
-	var req reqBody
+	var req EditProfileRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
@@ -44,13 +68,18 @@ func EditProfileHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "profile updated"})
 }
 
-// Handler for registration of user
+// RegisterUserHandler godoc
+// @Summary Register a new user
+// @Description Registers a new user with email and password
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param   user  body  UserCredentials  true  "User info"
+// @Success 200 {object} internal.TokenPair
+// @Failure 400 {string} string "Invalid request body"
+// @Router /register [post]
 func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
-	type reqBody struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-	var req reqBody
+	var req UserCredentials
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
 		return
@@ -64,13 +93,18 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tokenPair)
 }
 
-// Handler for login of user
+// LoginUserHandler godoc
+// @Summary Login user
+// @Description Authenticates user and returns tokens
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param   user  body  UserCredentials  true  "User info"
+// @Success 200 {object} internal.TokenPair
+// @Failure 400 {string} string "Invalid request body"
+// @Router /login [post]
 func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
-	type reqBody struct {
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
-	var req reqBody
+	var req UserCredentials
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
 		return
@@ -84,12 +118,18 @@ func LoginUserHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(tokenPair)
 }
 
-// Handler for refreshing access token
+// RefreshTokenHandler godoc
+// @Summary Refresh token
+// @Description Refreshes JWT token
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Param   refresh_token  body  RefreshTokenRequest  true  "Refresh token"
+// @Success 200 {object} internal.TokenPair
+// @Failure 400 {string} string "Invalid request body"
+// @Router /refresh [post]
 func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
-	type reqBody struct {
-		RefreshToken string `json:"refresh_token"`
-	}
-	var req reqBody
+	var req RefreshTokenRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
 		return
@@ -105,7 +145,16 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"access_token": newAccessToken})
 }
 
-// Handler for getting user profile
+// GetProfileHandler godoc
+// @Summary Get user profile
+// @Description Returns the profile of the authenticated user
+// @Tags user
+// @Produce  json
+// @Success 200 {object} map[string]interface{}
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 404 {string} string "User not found"
+// @Router /profile [get]
+// @Security BearerAuth
 func GetProfileHandler(w http.ResponseWriter, r *http.Request) {
 	email, ok := r.Context().Value("Email").(string)
 	if !ok {
@@ -119,9 +168,9 @@ func GetProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"id": user.ID.String(),
-		"name": user.Name,
+		"id":    user.ID.String(),
+		"name":  user.Name,
 		"email": user.Email,
-		"age": user.Age,
+		"age":   user.Age,
 	})
 }

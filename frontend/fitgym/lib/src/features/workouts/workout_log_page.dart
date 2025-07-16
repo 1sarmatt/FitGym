@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'workout_model.dart';
 import '../../common/api.dart';
 import 'dart:convert'; // Added for jsonDecode
+import 'package:fitgym/l10n/app_localizations.dart';
 
 class WorkoutLogPage extends StatefulWidget {
   const WorkoutLogPage({Key? key}) : super(key: key);
@@ -74,30 +75,30 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                 builder: (context) {
                   return AlertDialog(
                     backgroundColor: Colors.grey[900],
-                    title: const Text('Add Exercise', style: TextStyle(color: Colors.orangeAccent)),
+                    title: Text(AppLocalizations.of(context)!.addExercise, style: const TextStyle(color: Colors.orangeAccent)),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         TextField(
                           controller: nameController,
-                          decoration: const InputDecoration(labelText: 'Name', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.name, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                         ),
                         TextField(
                           controller: setsController,
-                          decoration: const InputDecoration(labelText: 'Sets', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.sets, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
                         TextField(
                           controller: repsController,
-                          decoration: const InputDecoration(labelText: 'Reps', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.reps, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
                         TextField(
                           controller: weightController,
-                          decoration: const InputDecoration(labelText: 'Weight (kg)', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.weightKg, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
@@ -106,7 +107,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel', style: TextStyle(color: Colors.orangeAccent)),
+                        child: Text(AppLocalizations.of(context)!.cancel, style: const TextStyle(color: Colors.orangeAccent)),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -122,7 +123,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                             Navigator.of(context).pop();
                           }
                         },
-                        child: const Text('Add'),
+                        child: Text(AppLocalizations.of(context)!.add),
                       ),
                     ],
                   );
@@ -140,30 +141,30 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                 builder: (context) {
                   return AlertDialog(
                     backgroundColor: Colors.grey[900],
-                    title: const Text('Edit Exercise', style: TextStyle(color: Colors.orangeAccent)),
+                    title: Text(AppLocalizations.of(context)!.editExercise, style: const TextStyle(color: Colors.orangeAccent)),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         TextField(
                           controller: nameController,
-                          decoration: const InputDecoration(labelText: 'Name', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.name, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                         ),
                         TextField(
                           controller: setsController,
-                          decoration: const InputDecoration(labelText: 'Sets', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.sets, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
                         TextField(
                           controller: repsController,
-                          decoration: const InputDecoration(labelText: 'Reps', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.reps, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
                         TextField(
                           controller: weightController,
-                          decoration: const InputDecoration(labelText: 'Weight (kg)', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.weightKg, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
@@ -172,7 +173,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel', style: TextStyle(color: Colors.orangeAccent)),
+                        child: Text(AppLocalizations.of(context)!.cancel, style: const TextStyle(color: Colors.orangeAccent)),
                       ),
                       TextButton(
                         onPressed: () {
@@ -181,7 +182,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                           });
                           Navigator.of(context).pop();
                         },
-                        child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                        child: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: Colors.redAccent)),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -197,7 +198,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                             Navigator.of(context).pop();
                           }
                         },
-                        child: const Text('Save'),
+                        child: Text(AppLocalizations.of(context)!.save),
                       ),
                     ],
                   );
@@ -206,7 +207,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
             }
             return AlertDialog(
               backgroundColor: Colors.grey[900],
-              title: const Text('Add Workout', style: TextStyle(color: Colors.orangeAccent)),
+              title: Text(AppLocalizations.of(context)!.addWorkout, style: const TextStyle(color: Colors.orangeAccent)),
               content: Form(
                 key: formKey,
                 child: SingleChildScrollView(
@@ -215,15 +216,15 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                     children: [
                       TextFormField(
                         controller: dateController,
-                        decoration: const InputDecoration(
-                          labelText: 'Date (DD.MM.YYYY)',
-                          labelStyle: TextStyle(color: Colors.orangeAccent),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.date,
+                          labelStyle: const TextStyle(color: Colors.orangeAccent),
                         ),
                         style: const TextStyle(color: Colors.white),
                         validator: (value) {
-                          if (value == null || value.isEmpty) return 'Enter date';
+                          if (value == null || value.isEmpty) return AppLocalizations.of(context)!.enterDate;
                           if (!RegExp(r'^\d{2}\.\d{2}\.\d{4}$').hasMatch(value)) {
-                            return 'Format: DD.MM.YYYY';
+                            return AppLocalizations.of(context)!.formatDateError;
                           }
                           return null;
                         },
@@ -231,19 +232,19 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: typeController,
-                        decoration: const InputDecoration(
-                          labelText: 'Workout Type',
-                          labelStyle: TextStyle(color: Colors.orangeAccent),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.workoutType,
+                          labelStyle: const TextStyle(color: Colors.orangeAccent),
                         ),
                         style: const TextStyle(color: Colors.white),
-                        validator: (value) => (value == null || value.isEmpty) ? 'Enter type' : null,
+                        validator: (value) => (value == null || value.isEmpty) ? AppLocalizations.of(context)!.enterType : null,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: notesController,
-                        decoration: const InputDecoration(
-                          labelText: 'Notes',
-                          labelStyle: TextStyle(color: Colors.orangeAccent),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.notes,
+                          labelStyle: const TextStyle(color: Colors.orangeAccent),
                         ),
                         style: const TextStyle(color: Colors.white),
                       ),
@@ -251,7 +252,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Exercises', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
+                          Text(AppLocalizations.of(context)!.exercises, style: const TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orangeAccent,
@@ -262,13 +263,13 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                             ),
                             onPressed: addExercise,
                             icon: const Icon(Icons.add, size: 18),
-                            label: const Text('Add'),
+                            label: Text(AppLocalizations.of(context)!.add),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       if (exercises.isEmpty)
-                        const Text('No exercises', style: TextStyle(color: Colors.white70)),
+                        Text(AppLocalizations.of(context)!.noExercises, style: const TextStyle(color: Colors.white70)),
                       ...exercises.asMap().entries.map((entry) {
                         final i = entry.key;
                         final ex = entry.value;
@@ -278,7 +279,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                           child: ListTile(
                             title: Text(ex['name'] ?? '', style: const TextStyle(color: Colors.orangeAccent)),
                             subtitle: Text(
-                              'Sets: ${ex['sets'] ?? '-'}, Reps: ${ex['reps'] ?? '-'}, Weight: ${ex['weight'] ?? '-'}',
+                              '${AppLocalizations.of(context)!.sets}: ${ex['sets'] ?? '-'}, ${AppLocalizations.of(context)!.reps}: ${ex['reps'] ?? '-'}, ${AppLocalizations.of(context)!.weight}: ${ex['weight'] ?? '-'}',
                               style: const TextStyle(color: Colors.white70, fontSize: 13),
                             ),
                             trailing: IconButton(
@@ -295,7 +296,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel', style: TextStyle(color: Colors.orangeAccent)),
+                  child: Text(AppLocalizations.of(context)!.cancel, style: const TextStyle(color: Colors.orangeAccent)),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -308,7 +309,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                       });
                     }
                   },
-                  child: const Text('Add'),
+                  child: Text(AppLocalizations.of(context)!.add),
                 ),
               ],
             );
@@ -321,26 +322,24 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
         final userId = await ApiService.getUserId();
         if (userId == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('User ID not found. Please re-login.')),
+            SnackBar(content: Text(AppLocalizations.of(context)!.userNotFound)),
           );
           return;
         }
         // Prepare workout data for backend
-        final exercises = (result['exercises'] as List)
-            .map((ex) => {
-                  'name': ex['name'],
-                  'sets': int.tryParse(ex['sets'] ?? '') ?? 0,
-                  'reps': int.tryParse(ex['reps'] ?? '') ?? 0,
-                  'weight': int.tryParse(ex['weight'] ?? '') ?? 0,
-                })
-            .toList();
+        final exercises = (result['exercises'] is Iterable) ? result['exercises'] as Iterable : const [];
         final workoutData = {
           'user_id': userId,
           'workout_type': result['type'],
           'date': _convertDateToBackendFormat(result['date']),
           'duration': 60, // TODO: replace with actual duration if available
           'notes': result['notes'] ?? '',
-          'exercises': exercises,
+          'exercises': exercises.map((ex) => {
+                  'name': ex['name'],
+                  'sets': int.tryParse(ex['sets'] ?? '') ?? 0,
+                  'reps': int.tryParse(ex['reps'] ?? '') ?? 0,
+                  'weight': int.tryParse(ex['weight'] ?? '') ?? 0,
+                }).toList(),
         };
         final response = await ApiService.addWorkout(workoutData);
         if (response.statusCode == 200 || response.statusCode == 201) {
@@ -352,12 +351,12 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
           await context.read<WorkoutModel>().fetchWorkouts();
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Failed to add workout: ${response.body}')),
+            SnackBar(content: Text('${AppLocalizations.of(context)!.failedToAddWorkout}: ${response.body}')),
           );
         }
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: ${e.toString()}')),
+          SnackBar(content: Text('${AppLocalizations.of(context)!.error}: ${e.toString()}')),
         );
       }
     }
@@ -369,7 +368,9 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
     final typeController = TextEditingController(text: workout['type']);
     final notesController = TextEditingController(text: workout['notes']);
     final formKey = GlobalKey<FormState>();
-    List<Map<String, String>> exercises = List<Map<String, String>>.from(workout['exercises'] ?? []);
+    List<Map<String, String>> exercises = (workout['exercises'] is Iterable)
+        ? List<Map<String, String>>.from(workout['exercises'])
+        : <Map<String, String>>[];
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (context) {
@@ -385,30 +386,30 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                 builder: (context) {
                   return AlertDialog(
                     backgroundColor: Colors.grey[900],
-                    title: const Text('Add Exercise', style: TextStyle(color: Colors.orangeAccent)),
+                    title: Text(AppLocalizations.of(context)!.addExercise, style: const TextStyle(color: Colors.orangeAccent)),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         TextField(
                           controller: nameController,
-                          decoration: const InputDecoration(labelText: 'Name', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.name, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                         ),
                         TextField(
                           controller: setsController,
-                          decoration: const InputDecoration(labelText: 'Sets', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.sets, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
                         TextField(
                           controller: repsController,
-                          decoration: const InputDecoration(labelText: 'Reps', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.reps, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
                         TextField(
                           controller: weightController,
-                          decoration: const InputDecoration(labelText: 'Weight (kg)', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.weightKg, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
@@ -417,7 +418,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel', style: TextStyle(color: Colors.orangeAccent)),
+                        child: Text(AppLocalizations.of(context)!.cancel, style: const TextStyle(color: Colors.orangeAccent)),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -433,7 +434,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                             Navigator.of(context).pop();
                           }
                         },
-                        child: const Text('Add'),
+                        child: Text(AppLocalizations.of(context)!.add),
                       ),
                     ],
                   );
@@ -451,30 +452,30 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                 builder: (context) {
                   return AlertDialog(
                     backgroundColor: Colors.grey[900],
-                    title: const Text('Edit Exercise', style: TextStyle(color: Colors.orangeAccent)),
+                    title: Text(AppLocalizations.of(context)!.editExercise, style: const TextStyle(color: Colors.orangeAccent)),
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         TextField(
                           controller: nameController,
-                          decoration: const InputDecoration(labelText: 'Name', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.name, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                         ),
                         TextField(
                           controller: setsController,
-                          decoration: const InputDecoration(labelText: 'Sets', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.sets, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
                         TextField(
                           controller: repsController,
-                          decoration: const InputDecoration(labelText: 'Reps', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.reps, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
                         TextField(
                           controller: weightController,
-                          decoration: const InputDecoration(labelText: 'Weight (kg)', labelStyle: TextStyle(color: Colors.orangeAccent)),
+                          decoration: InputDecoration(labelText: AppLocalizations.of(context)!.weightKg, labelStyle: const TextStyle(color: Colors.orangeAccent)),
                           style: const TextStyle(color: Colors.white),
                           keyboardType: TextInputType.number,
                         ),
@@ -483,7 +484,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.of(context).pop(),
-                        child: const Text('Cancel', style: TextStyle(color: Colors.orangeAccent)),
+                        child: Text(AppLocalizations.of(context)!.cancel, style: const TextStyle(color: Colors.orangeAccent)),
                       ),
                       TextButton(
                         onPressed: () {
@@ -492,7 +493,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                           });
                           Navigator.of(context).pop();
                         },
-                        child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                        child: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: Colors.redAccent)),
                       ),
                       ElevatedButton(
                         onPressed: () {
@@ -508,7 +509,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                             Navigator.of(context).pop();
                           }
                         },
-                        child: const Text('Save'),
+                        child: Text(AppLocalizations.of(context)!.save),
                       ),
                     ],
                   );
@@ -517,7 +518,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
             }
             return AlertDialog(
               backgroundColor: Colors.grey[900],
-              title: const Text('Edit Workout', style: TextStyle(color: Colors.orangeAccent)),
+              title: Text(AppLocalizations.of(context)!.editWorkout, style: const TextStyle(color: Colors.orangeAccent)),
               content: Form(
                 key: formKey,
                 child: SingleChildScrollView(
@@ -526,15 +527,15 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                     children: [
                       TextFormField(
                         controller: dateController,
-                        decoration: const InputDecoration(
-                          labelText: 'Date (DD.MM.YYYY)',
-                          labelStyle: TextStyle(color: Colors.orangeAccent),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.date,
+                          labelStyle: const TextStyle(color: Colors.orangeAccent),
                         ),
                         style: const TextStyle(color: Colors.white),
                         validator: (value) {
-                          if (value == null || value.isEmpty) return 'Enter date';
+                          if (value == null || value.isEmpty) return AppLocalizations.of(context)!.enterDate;
                           if (!RegExp(r'^\d{2}\.\d{2}\.\d{4}$').hasMatch(value)) {
-                            return 'Format: DD.MM.YYYY';
+                            return AppLocalizations.of(context)!.formatDateError;
                           }
                           return null;
                         },
@@ -542,19 +543,19 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: typeController,
-                        decoration: const InputDecoration(
-                          labelText: 'Workout Type',
-                          labelStyle: TextStyle(color: Colors.orangeAccent),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.workoutType,
+                          labelStyle: const TextStyle(color: Colors.orangeAccent),
                         ),
                         style: const TextStyle(color: Colors.white),
-                        validator: (value) => (value == null || value.isEmpty) ? 'Enter type' : null,
+                        validator: (value) => (value == null || value.isEmpty) ? AppLocalizations.of(context)!.enterType : null,
                       ),
                       const SizedBox(height: 12),
                       TextFormField(
                         controller: notesController,
-                        decoration: const InputDecoration(
-                          labelText: 'Notes',
-                          labelStyle: TextStyle(color: Colors.orangeAccent),
+                        decoration: InputDecoration(
+                          labelText: AppLocalizations.of(context)!.notes,
+                          labelStyle: const TextStyle(color: Colors.orangeAccent),
                         ),
                         style: const TextStyle(color: Colors.white),
                       ),
@@ -562,7 +563,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text('Exercises', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
+                          Text(AppLocalizations.of(context)!.exercises, style: const TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold)),
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.orangeAccent,
@@ -573,13 +574,13 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                             ),
                             onPressed: addExercise,
                             icon: const Icon(Icons.add, size: 18),
-                            label: const Text('Add'),
+                            label: Text(AppLocalizations.of(context)!.add),
                           ),
                         ],
                       ),
                       const SizedBox(height: 8),
                       if (exercises.isEmpty)
-                        const Text('No exercises', style: TextStyle(color: Colors.white70)),
+                        Text(AppLocalizations.of(context)!.noExercises, style: const TextStyle(color: Colors.white70)),
                       ...exercises.asMap().entries.map((entry) {
                         final i = entry.key;
                         final ex = entry.value;
@@ -589,7 +590,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                           child: ListTile(
                             title: Text(ex['name'] ?? '', style: const TextStyle(color: Colors.orangeAccent)),
                             subtitle: Text(
-                              'Sets: ${ex['sets'] ?? '-'}, Reps: ${ex['reps'] ?? '-'}, Weight: ${ex['weight'] ?? '-'}',
+                              '${AppLocalizations.of(context)!.sets}: ${ex['sets'] ?? '-'}, ${AppLocalizations.of(context)!.reps}: ${ex['reps'] ?? '-'}, ${AppLocalizations.of(context)!.weight}: ${ex['weight'] ?? '-'}',
                               style: const TextStyle(color: Colors.white70, fontSize: 13),
                             ),
                             trailing: IconButton(
@@ -606,11 +607,11 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop({'action': 'delete'}),
-                  child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                  child: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: Colors.redAccent)),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cancel', style: TextStyle(color: Colors.orangeAccent)),
+                  child: Text(AppLocalizations.of(context)!.cancel, style: const TextStyle(color: Colors.orangeAccent)),
                 ),
                 ElevatedButton(
                   onPressed: () async {
@@ -618,7 +619,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                       final id = workout['id'];
                       if (id == null) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Workout ID not found.')),
+                          SnackBar(content: Text(AppLocalizations.of(context)!.workoutIdNotFound)),
                         );
                         return;
                       }
@@ -650,12 +651,12 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                         });
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Failed to update workout: ${response.body}')),
+                          SnackBar(content: Text('${AppLocalizations.of(context)!.failedToUpdateWorkout}: ${response.body}')),
                         );
                       }
                     }
                   },
-                  child: const Text('Save'),
+                  child: Text(AppLocalizations.of(context)!.save),
                 ),
               ],
             );
@@ -670,8 +671,87 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
     }
   }
 
+  void _completeWorkout(int i) async {
+    final w = context.read<WorkoutModel>().workouts[i];
+    final workoutId = w['id'];
+    if (workoutId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.workoutIdNotFound)),
+      );
+      return;
+    }
+    try {
+      final response = await ApiService.completeWorkout(workoutId);
+      if (response.statusCode == 200) {
+        await context.read<WorkoutModel>().fetchWorkouts();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.workoutMarkedAsCompleted)),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${AppLocalizations.of(context)!.failedToCompleteWorkout}: ${response.body}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${AppLocalizations.of(context)!.error}: ${e.toString()}')),
+      );
+    }
+  }
+
+  void _deleteWorkout(int i) async {
+    final w = context.read<WorkoutModel>().workouts[i];
+    final workoutId = w['id'];
+    if (workoutId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppLocalizations.of(context)!.workoutIdNotFound)),
+      );
+      return;
+    }
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.deleteWorkout),
+        content: Text(AppLocalizations.of(context)!.confirmDeleteWorkout),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(AppLocalizations.of(context)!.delete, style: const TextStyle(color: Colors.redAccent)),
+          ),
+        ],
+      ),
+    );
+    if (confirm == true) {
+      try {
+        final response = await ApiService.deleteWorkout(workoutId);
+        if (response.statusCode == 200) {
+          await context.read<WorkoutModel>().fetchWorkouts();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(AppLocalizations.of(context)!.workoutDeleted)),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${AppLocalizations.of(context)!.failedToDeleteWorkout}: ${response.body}')),
+          );
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${AppLocalizations.of(context)!.error}: ${e.toString()}')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
+    final localizations = AppLocalizations.of(context)!;
     final workouts = context.watch<WorkoutModel>().workouts;
     final history = context.watch<WorkoutModel>().history;
     return Scaffold(
@@ -682,7 +762,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 500),
               child: Card(
-                color: Colors.grey[850],
+                color: theme.cardColor,
                 elevation: 8,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 child: Padding(
@@ -694,63 +774,59 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Workout Log',
-                              style: TextStyle(
-                                color: Colors.orangeAccent,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              )),
+                          Text(localizations.workoutLog,
+                              style: textTheme.titleLarge),
                           ElevatedButton.icon(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.orangeAccent,
-                              foregroundColor: Colors.black,
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             onPressed: _addWorkout,
                             icon: const Icon(Icons.add),
-                            label: const Text('Add'),
+                            label: Text(localizations.add),
                           ),
                         ],
                       ),
                       const SizedBox(height: 24),
                       workouts.isEmpty && history.isEmpty
                           ? Center(
-                              child: Text('No workouts yet.', style: TextStyle(color: Colors.white70)),
+                              child: Text(localizations.noWorkoutsYet, style: textTheme.bodyMedium),
                             )
                           : Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 if (workouts.isNotEmpty)
                                   ...[
-                                    Text('Active Workouts', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 18)),
+                                    Text(localizations.activeWorkouts, style: textTheme.bodyLarge?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 18)),
                                     ListView.separated(
                                       shrinkWrap: true,
                                       physics: const NeverScrollableScrollPhysics(),
                                       itemCount: workouts.length,
-                                      separatorBuilder: (_, __) => Divider(color: Colors.orangeAccent.withOpacity(0.2)),
+                                      separatorBuilder: (_, __) => Divider(color: colorScheme.primary.withOpacity(0.2)),
                                       itemBuilder: (context, i) {
                                         final w = workouts[i];
                                         return ListTile(
-                                          leading: Icon(Icons.fitness_center, color: Colors.orangeAccent),
-                                          title: Text(w['type'] ?? '', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                          leading: Icon(Icons.fitness_center, color: colorScheme.primary),
+                                          title: Text(w['type'] ?? '', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
                                           subtitle: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Text(formatDate(w['date'] ?? ''), style: TextStyle(color: Colors.orangeAccent, fontSize: 13)),
+                                              Text(formatDate(w['date'] ?? ''), style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary, fontSize: 13)),
                                               if ((w['notes'] ?? '').isNotEmpty)
-                                                Text(w['notes']!, style: TextStyle(color: Colors.white70, fontSize: 13)),
-                                              if ((w['exercises'] ?? []).isNotEmpty)
+                                                Text(w['notes']!, style: textTheme.bodyMedium?.copyWith(fontSize: 13)),
+                                              if ((w['exercises'] is Iterable) && (w['exercises'] as Iterable).isNotEmpty)
                                                 Padding(
                                                   padding: const EdgeInsets.only(top: 6.0),
                                                   child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      const Text('Exercises:', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 13)),
-                                                      ...List<Widget>.from((w['exercises'] as List).map((ex) => Text(
+                                                      Text(localizations.exercises, style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 13)),
+                                                      ...List<Widget>.from((w['exercises'] as Iterable).map((ex) => Text(
                                                         '${ex['name']} — ${ex['sets']}x${ex['reps']}${(ex['weight'] != null && ex['weight'] != '') ? ' @ ${ex['weight']}kg' : ''}',
-                                                        style: const TextStyle(color: Colors.white70, fontSize: 13),
+                                                        style: textTheme.bodyMedium?.copyWith(fontSize: 13),
                                                       ))),
                                                     ],
                                                   ),
@@ -763,125 +839,62 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
                                             children: [
                                               ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.green,
+                                                  backgroundColor: Colors.green, // Optional: you can theme this too
                                                   foregroundColor: Colors.white,
                                                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                                   textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                                 ),
-                                                onPressed: () async {
-                                                  final workoutId = w['id'];
-                                                  if (workoutId == null) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(content: Text('Workout ID not found.')),
-                                                    );
-                                                    return;
-                                                  }
-                                                  try {
-                                                    final response = await ApiService.completeWorkout(workoutId);
-                                                    if (response.statusCode == 200) {
-                                                      await context.read<WorkoutModel>().fetchWorkouts();
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(content: Text('Workout marked as completed!')),
-                                                      );
-                                                    } else {
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(content: Text('Failed to complete workout: ${response.body}')),
-                                                      );
-                                                    }
-                                                  } catch (e) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(content: Text('Error: ${e.toString()}')),
-                                                    );
-                                                  }
-                                                },
-                                                child: const Text('Done'),
+                                                onPressed: () => _completeWorkout(i),
+                                                child: Text(localizations.complete),
                                               ),
                                               const SizedBox(width: 8),
-                                              IconButton(
-                                                icon: Icon(Icons.delete, color: Colors.redAccent),
-                                                onPressed: () async {
-                                                  final workoutId = w['id'];
-                                                  if (workoutId == null) {
-                                                    ScaffoldMessenger.of(context).showSnackBar(
-                                                      SnackBar(content: Text('Workout ID not found.')),
-                                                    );
-                                                    return;
-                                                  }
-                                                  final confirm = await showDialog<bool>(
-                                                    context: context,
-                                                    builder: (context) => AlertDialog(
-                                                      title: const Text('Delete Workout'),
-                                                      content: const Text('Are you sure you want to delete this workout?'),
-                                                      actions: [
-                                                        TextButton(
-                                                          onPressed: () => Navigator.of(context).pop(false),
-                                                          child: const Text('Cancel'),
-                                                        ),
-                                                        TextButton(
-                                                          onPressed: () => Navigator.of(context).pop(true),
-                                                          child: const Text('Delete', style: TextStyle(color: Colors.redAccent)),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  );
-                                                  if (confirm == true) {
-                                                    try {
-                                                      final response = await ApiService.deleteWorkout(workoutId);
-                                                      if (response.statusCode == 200) {
-                                                        await context.read<WorkoutModel>().fetchWorkouts();
-                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                          SnackBar(content: Text('Workout deleted!')),
-                                                        );
-                                                      } else {
-                                                        ScaffoldMessenger.of(context).showSnackBar(
-                                                          SnackBar(content: Text('Failed to delete workout: ${response.body}')),
-                                                        );
-                                                      }
-                                                    } catch (e) {
-                                                      ScaffoldMessenger.of(context).showSnackBar(
-                                                        SnackBar(content: Text('Error: ${e.toString()}')),
-                                                      );
-                                                    }
-                                                  }
-                                                },
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.redAccent, // Optional: you can theme this too
+                                                  foregroundColor: Colors.white,
+                                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                                  textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                                ),
+                                                onPressed: () => _deleteWorkout(i),
+                                                child: Text(localizations.delete),
                                               ),
                                             ],
                                           ),
                                         );
                                       },
                                     ),
-                                    const SizedBox(height: 24),
                                   ],
                                 if (history.isNotEmpty)
                                   ...[
-                                    Text('Workout History', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 18)),
+                                    Text(localizations.workoutHistory, style: textTheme.bodyLarge?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 18)),
                                     ListView.separated(
                                       shrinkWrap: true,
                                       physics: const NeverScrollableScrollPhysics(),
                                       itemCount: history.length,
-                                      separatorBuilder: (_, __) => Divider(color: Colors.orangeAccent.withOpacity(0.2)),
+                                      separatorBuilder: (_, __) => Divider(color: colorScheme.primary.withOpacity(0.2)),
                                       itemBuilder: (context, i) {
                                         final w = history[i];
                                         return ListTile(
-                                          leading: Icon(Icons.history, color: Colors.orangeAccent),
-                                          title: Text(w['type'] ?? '', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                          leading: Icon(Icons.history, color: colorScheme.primary),
+                                          title: Text(w['type'] ?? '', style: textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold)),
                                           subtitle: Column(
                                             crossAxisAlignment: CrossAxisAlignment.start,
                                             children: [
-                                              Text(formatDate(w['date'] ?? ''), style: TextStyle(color: Colors.orangeAccent, fontSize: 13)),
+                                              Text(formatDate(w['date'] ?? ''), style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary, fontSize: 13)),
                                               if ((w['notes'] ?? '').isNotEmpty)
-                                                Text(w['notes']!, style: TextStyle(color: Colors.white70, fontSize: 13)),
-                                              if ((w['exercises'] ?? []).isNotEmpty)
+                                                Text(w['notes']!, style: textTheme.bodyMedium?.copyWith(fontSize: 13)),
+                                              if ((w['exercises'] is Iterable) && (w['exercises'] as Iterable).isNotEmpty)
                                                 Padding(
                                                   padding: const EdgeInsets.only(top: 6.0),
                                                   child: Column(
                                                     crossAxisAlignment: CrossAxisAlignment.start,
                                                     children: [
-                                                      const Text('Exercises:', style: TextStyle(color: Colors.orangeAccent, fontWeight: FontWeight.bold, fontSize: 13)),
-                                                      ...List<Widget>.from((w['exercises'] as List).map((ex) => Text(
+                                                      Text(localizations.exercises, style: textTheme.bodyMedium?.copyWith(color: colorScheme.primary, fontWeight: FontWeight.bold, fontSize: 13)),
+                                                      ...List<Widget>.from((w['exercises'] as Iterable).map((ex) => Text(
                                                         '${ex['name']} — ${ex['sets']}x${ex['reps']}${(ex['weight'] != null && ex['weight'] != '') ? ' @ ${ex['weight']}kg' : ''}',
-                                                        style: const TextStyle(color: Colors.white70, fontSize: 13),
+                                                        style: textTheme.bodyMedium?.copyWith(fontSize: 13),
                                                       ))),
                                                     ],
                                                   ),
@@ -903,25 +916,23 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
         ),
       ),
       bottomNavigationBar: NavigationBar(
-        backgroundColor: Colors.grey[900],
-        indicatorColor: Colors.orangeAccent.withOpacity(0.1),
+        backgroundColor: theme.bottomAppBarTheme.color ?? colorScheme.surface,
+        indicatorColor: colorScheme.primary.withOpacity(0.1),
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onNavTap,
-        destinations: const [
+        labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
+        destinations: [
           NavigationDestination(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-            tooltip: '',
+            icon: Icon(Icons.person, color: _selectedIndex == 0 ? colorScheme.primary : colorScheme.onSurface.withOpacity(0.7)),
+            label: localizations.profile,
           ),
           NavigationDestination(
-            icon: Icon(Icons.fitness_center),
-            label: 'Workout Log',
-            tooltip: '',
+            icon: Icon(Icons.fitness_center, color: _selectedIndex == 1 ? colorScheme.primary : colorScheme.onSurface.withOpacity(0.7)),
+            label: localizations.workoutLog,
           ),
           NavigationDestination(
-            icon: Icon(Icons.show_chart),
-            label: 'Progress',
-            tooltip: '',
+            icon: Icon(Icons.show_chart, color: _selectedIndex == 2 ? colorScheme.primary : colorScheme.onSurface.withOpacity(0.7)),
+            label: localizations.progress,
           ),
         ],
       ),

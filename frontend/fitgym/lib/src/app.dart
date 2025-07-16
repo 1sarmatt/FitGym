@@ -11,6 +11,26 @@ import 'features/social/social_page.dart';
 import 'features/workouts/workout_model.dart';
 import 'common/theme.dart';
 import 'welcome_page.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:fitgym/l10n/app_localizations.dart';
+
+class ThemeLocaleNotifier extends ChangeNotifier {
+  ThemeMode _themeMode = ThemeMode.system;
+  Locale _locale = const Locale('en');
+
+  ThemeMode get themeMode => _themeMode;
+  Locale get locale => _locale;
+
+  void setThemeMode(ThemeMode mode) {
+    _themeMode = mode;
+    notifyListeners();
+  }
+
+  void setLocale(Locale locale) {
+    _locale = locale;
+    notifyListeners();
+  }
+}
 
 class FitGymApp extends StatelessWidget {
   const FitGymApp({Key? key}) : super(key: key);
@@ -110,12 +130,24 @@ class FitGymApp extends StatelessWidget {
       ],
     );
 
-    return ChangeNotifierProvider(
-      create: (_) => WorkoutModel(),
-      child: MaterialApp.router(
-        title: 'FitGym',
-        theme: appTheme,
-        routerConfig: _router,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => WorkoutModel()),
+        ChangeNotifierProvider(create: (_) => ThemeLocaleNotifier()),
+      ],
+      child: Consumer<ThemeLocaleNotifier>(
+        builder: (context, themeLocale, _) {
+          return MaterialApp.router(
+            title: 'FitGym',
+            theme: appLightTheme,
+            darkTheme: appDarkTheme,
+            themeMode: themeLocale.themeMode,
+            locale: themeLocale.locale,
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: _router,
+          );
+        },
       ),
     );
   }
