@@ -79,6 +79,17 @@ Contributions are welcome! Feel free to fork this repository, make changes, and 
 * Add progress tracking (charts/graphs)
 * Improve UI responsiveness
 
+## Screenshots of the main features
+
+![login page](ReadmeData/login%20page.png)
+![login image](ReadmeData/login%20image.png)
+![Register page](ReadmeData/register%20page.png)
+![Profile filling](ReadmeData/Proflie%20filling.png)
+![Light theme](ReadmeData/Light%20theme.png)
+![Rus](ReadmeData/russian.png)
+![workout log](ReadmeData/workout%20log.png)
+![friends](ReadmeData/Frinds%20page.png)
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for more information.
