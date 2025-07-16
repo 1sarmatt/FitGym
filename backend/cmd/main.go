@@ -53,6 +53,18 @@ func main() {
 	}
 
 	r := chi.NewRouter()
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{
+			"https://fitgym-org.github.io", // GitHub Pages
+			"http://localhost:80",          // Local dev (optional)
+			"http://localhost:8080",        // Optional if testing backend directly
+		},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // cache preflight response for 5 minutes
+	}))
 
 	// Swagger docs endpoint
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
@@ -66,18 +78,7 @@ func main() {
 	handlers.WorkoutRepo = pg.NewWorkoutRepository(db)
 	handlers.ExerciseRepo = pg.NewExerciseRepository(db)
 
-	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins: []string{
-			"https://fitgym-org.github.io", // GitHub Pages
-			"http://localhost:80",          // Local dev (optional)
-			"http://localhost:8080",        // Optional if testing backend directly
-		},
-		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
-		ExposedHeaders:   []string{"Link"},
-		AllowCredentials: true,
-		MaxAge:           300, // cache preflight response for 5 minutes
-	}))
+
 	r.Post("/addWorkout", handlers.AddWorkoutHandler)
 	r.Post("/addExercise", handlers.AddExerciseHandler)
 	r.Get("/getWorkoutHistory", handlers.GetWorkoutHistoryHandler)
