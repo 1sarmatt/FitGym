@@ -18,6 +18,13 @@ FitGym is a simple web-based fitness tracking application built with Go, Dart Fl
 
 ## Installation
 
+### using Docker compose 
+
+```
+docker compose up --build -d
+```
+
+### Manually
 - **For running backend part**
 
 ```
