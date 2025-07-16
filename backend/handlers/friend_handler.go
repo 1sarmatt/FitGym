@@ -7,8 +7,25 @@ import (
 	"net/http"
 )
 
+// AddFriendRequest represents the request body for adding a friend
+type AddFriendRequest struct {
+	FriendEmail string `json:"friend_email"`
+}
+
 var FriendRepo *postgres.FriendRepository
 
+// AddFriendHandler godoc
+// @Summary Add friend
+// @Description Adds a friend to the user's friend list
+// @Tags friend
+// @Accept  json
+// @Produce  json
+// @Param   friend  body  AddFriendRequest  true  "Friend info"
+// @Success 200 {object} map[string]string
+// @Failure 400 {string} string "Invalid request body"
+// @Failure 401 {string} string "Unauthorized"
+// @Router /addFriend [post]
+// @Security BearerAuth
 func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 
 	userEmail, ok := r.Context().Value("Email").(string)
@@ -17,17 +34,14 @@ func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	type reqBody struct {
-		Email string `json:"friend_email"`
-	}
-	var req reqBody
+	var req AddFriendRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
 		return
 	}
 
-	friendID, err := UserRepo.GetUserIDByEmail(req.Email)
+	friendID, err := UserRepo.GetUserIDByEmail(req.FriendEmail)
 	if err != nil {
 		http.Error(w, "Friend user not found", http.StatusNotFound)
 		return
@@ -47,6 +61,16 @@ func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"status": "friend added"})
 }
 
+// GetFriendsHandler godoc
+// @Summary Get friends
+// @Description Retrieves the user's friend list
+// @Tags friend
+// @Produce  json
+// @Success 200 {array} map[string]interface{}
+// @Failure 401 {string} string "Unauthorized"
+// @Failure 404 {string} string "User not found"
+// @Router /getFriends [get]
+// @Security BearerAuth
 func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
 	userEmail, ok := r.Context().Value("Email").(string)
 	if !ok {

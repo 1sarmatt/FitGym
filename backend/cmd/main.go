@@ -1,3 +1,12 @@
+// @title FitGym API
+// @version 1.0
+// @description API for FitGym fitness tracking app.
+// @host localhost:8080
+// @BasePath /
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 package main
 
 import (
@@ -14,6 +23,10 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
+
+	_ "fitgym/backend/cmd/docs" // swag generated docs
+
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
 func withCORS(h http.Handler) http.Handler {
@@ -51,6 +64,9 @@ func main() {
 	}
 
 	r := chi.NewRouter()
+
+	// Swagger docs endpoint
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	workoutService := serivces.NewWorkoutService()
 	userService := serivces.NewUserService()
