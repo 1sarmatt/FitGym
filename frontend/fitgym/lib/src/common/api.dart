@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static String get baseUrl => dotenv.get('API_BASE_URL');
+  static String baseUrl = String.fromEnvironment('API_URL');
 
   // Registration
   static Future<http.Response> register(String email, String password) {

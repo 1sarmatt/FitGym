@@ -21,6 +21,6 @@ WORKDIR $APP
 
 RUN flutter clean
 RUN flutter pub get
-RUN flutter build web --base-href="/FitGym/"
+#RUN flutter build web --base-href="/FitGym/"
 
-# CMD ["flutter", "build", "web", "--release"] 
+CMD ["flutter", "build", "web", "--release", "--dart-define=API_URL=${API_URL}"] 

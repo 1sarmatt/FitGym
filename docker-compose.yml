@@ -1,10 +1,14 @@
 services:
   frontend:
+    env_file:
+      - ./frontend/fitgym/.env
     build: 
       context: ./frontend/fitgym
       dockerfile: frontend.Dockerfile
-    # depends_on:
-    #   - backend
+      args:
+        API_URL: ${API_URL} 
+    depends_on:
+      - nginx
     volumes:
       - web-build:/app/build/web
     networks:
