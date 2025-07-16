@@ -26854,7 +26854,7 @@ while(true)switch(s){case 0:l=A
 s=3
 return A.J(A.f_(),$async$a24)
 case 3:p=l.c_(c.a.h(0,"access_token"))
-o=A.cJ("http://localhost:8080/addFriend")
+o=A.cJ("http://193.148.58.102:8080/addFriend")
 n=t.N
 m=A.a6(["Authorization","Bearer "+A.j(p),"Content-Type","application/json"],n,n)
 q=A.a1s(o,B.aL.l7(A.a6(["friend_email",a],n,n),null),m)
@@ -26869,7 +26869,7 @@ s=3
 return A.J(A.f_(),$async$a29)
 case 3:p=n.c_(b.a.h(0,"access_token"))
 o=t.N
-q=A.axy(A.cJ("http://localhost:8080/getFriends"),A.a6(["Authorization","Bearer "+A.j(p)],o,o))
+q=A.axy(A.cJ("http://193.148.58.102:8080/getFriends"),A.a6(["Authorization","Bearer "+A.j(p)],o,o))
 s=1
 break
 case 1:return A.N(q,r)}})
@@ -26881,7 +26881,7 @@ while(true)switch(s){case 0:l=A
 s=3
 return A.J(A.f_(),$async$a2c)
 case 3:p=l.c_(d.a.h(0,"access_token"))
-o=A.cJ("http://localhost:8080/editProfile")
+o=A.cJ("http://193.148.58.102:8080/editProfile")
 n=t.N
 m=A.a6(["Authorization","Bearer "+A.j(p),"Content-Type","application/json"],n,n)
 q=A.aIL(o,B.aL.l7(A.a6(["name",a,"age",b],n,t.K),null),m)
@@ -26896,7 +26896,7 @@ while(true)switch(s){case 0:m=A
 s=3
 return A.J(A.f_(),$async$a25)
 case 3:p=m.c_(c.a.h(0,"access_token"))
-o=A.cJ("http://localhost:8080/addWorkout")
+o=A.cJ("http://193.148.58.102:8080/addWorkout")
 n=t.N
 n=A.a6(["Authorization","Bearer "+A.j(p),"Content-Type","application/json"],n,n)
 q=A.a1s(o,B.aL.l7(a,null),n)
@@ -26911,7 +26911,7 @@ while(true)switch(s){case 0:l=A
 s=3
 return A.J(A.f_(),$async$a26)
 case 3:p=l.c_(c.a.h(0,"access_token"))
-o=A.cJ("http://localhost:8080/completeWorkout")
+o=A.cJ("http://193.148.58.102:8080/completeWorkout")
 n=t.N
 m=A.a6(["Authorization","Bearer "+A.j(p),"Content-Type","application/json"],n,n)
 q=A.a1s(o,B.aL.l7(A.a6(["workout_id",a],n,n),null),m)
@@ -26926,7 +26926,7 @@ while(true)switch(s){case 0:l=A
 s=3
 return A.J(A.f_(),$async$a2d)
 case 3:p=l.c_(g.a.h(0,"access_token"))
-o=A.cJ("http://localhost:8080/editWorkout")
+o=A.cJ("http://193.148.58.102:8080/editWorkout")
 n=t.N
 m=A.a6(["Authorization","Bearer "+A.j(p),"Content-Type","application/json"],n,n)
 q=A.aIL(o,B.aL.l7(A.a6(["id",c,"notes",d,"date",a,"type",e,"exercises",b],n,t.K),null),m)
@@ -26941,7 +26941,7 @@ while(true)switch(s){case 0:l=A
 s=3
 return A.J(A.f_(),$async$a27)
 case 3:p=l.c_(c.a.h(0,"access_token"))
-o=A.cJ("http://localhost:8080/deleteWorkout")
+o=A.cJ("http://193.148.58.102:8080/deleteWorkout")
 n=t.N
 m=A.a6(["Authorization","Bearer "+A.j(p),"Content-Type","application/json"],n,n)
 q=A.aIZ(o,B.aL.l7(A.a6(["id",a],n,n),null),m)
@@ -26978,7 +26978,7 @@ case 3:o=b
 n=A.c_(o.a.h(0,"access_token"))
 m=t.N
 s=4
-return A.J(A.axy(A.cJ("http://localhost:8080/profile"),A.a6(["Authorization","Bearer "+A.j(n)],m,m)),$async$wL)
+return A.J(A.axy(A.cJ("http://193.148.58.102:8080/profile"),A.a6(["Authorization","Bearer "+A.j(n)],m,m)),$async$wL)
 case 4:l=b
 s=l.b===200?5:6
 break
@@ -27013,7 +27013,7 @@ s=3
 return A.J(A.f_(),$async$a2b)
 case 3:p=n.c_(b.a.h(0,"access_token"))
 o=t.N
-q=A.axy(A.cJ("http://localhost:8080/getWorkouts"),A.a6(["Authorization","Bearer "+A.j(p)],o,o))
+q=A.axy(A.cJ("http://193.148.58.102:8080/getWorkouts"),A.a6(["Authorization","Bearer "+A.j(p)],o,o))
 s=1
 break
 case 1:return A.N(q,r)}})
@@ -27026,7 +27026,7 @@ s=3
 return A.J(A.f_(),$async$a28)
 case 3:p=n.c_(c.a.h(0,"access_token"))
 o=t.N
-q=A.axy(A.cJ("http://localhost:8080/getFriendWorkoutsByEmail?friend_email="+a),A.a6(["Authorization","Bearer "+A.j(p)],o,o))
+q=A.axy(A.cJ("http://193.148.58.102:8080/getFriendWorkoutsByEmail?friend_email="+a),A.a6(["Authorization","Bearer "+A.j(p)],o,o))
 s=1
 break
 case 1:return A.N(q,r)}})
@@ -40512,7 +40512,7 @@ var $async$qs=A.L(function(a,b){if(a===1)return A.M(b,r)
 while(true)switch(s){case 0:o=q.e
 n=o.a.a
 m=q.f.a.a
-l=A.cJ("http://localhost:8080/login")
+l=A.cJ("http://193.148.58.102:8080/login")
 k=t.N
 j=A.a6(["Content-Type","application/json"],k,k)
 s=2
@@ -40867,7 +40867,7 @@ var $async$qB=A.L(function(a,b){if(a===1)return A.M(b,r)
 while(true)switch(s){case 0:o=q.e
 n=o.a.a
 m=q.f.a.a
-l=A.cJ("http://localhost:8080/register")
+l=A.cJ("http://193.148.58.102:8080/register")
 k=t.N
 j=A.a6(["Content-Type","application/json"],k,k)
 s=2
