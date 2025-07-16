@@ -90,6 +90,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             style: textTheme.titleLarge?.copyWith(color: colorScheme.primary)),
                         const SizedBox(height: 24),
                         TextFormField(
+                          key: const Key('emailField'),
                           controller: _emailController,
                           style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
                           decoration: InputDecoration(
@@ -117,6 +118,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         const SizedBox(height: 20),
                         TextFormField(
+                          key: const Key('passwordField'),
                           controller: _passwordController,
                           style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
                           decoration: InputDecoration(
@@ -150,6 +152,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         const SizedBox(height: 20),
                         TextFormField(
+                          key: const Key('confirmPasswordField'),
                           controller: _confirmPasswordController,
                           style: textTheme.bodyLarge?.copyWith(color: colorScheme.onSurface),
                           decoration: InputDecoration(
