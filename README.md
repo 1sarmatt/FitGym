@@ -98,6 +98,10 @@ Contributions are welcome! Feel free to fork this repository, make changes, and 
 - Lutfullin Sarmat Frontend
 - Fominykh Aleksei DevOps
 
+## Link to backlog
+
+https://github.com/orgs/Fitgym-org/projects/1
+
 
 ## License
 
