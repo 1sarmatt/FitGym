@@ -45,10 +45,15 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   void register() async {
+  try {
+    print('▶ Отправка запроса на регистрацию...');
     final response = await ApiService.register(
       _emailController.text,
       _passwordController.text,
     );
+    print('✅ Ответ от сервера: ${response.statusCode}');
+    print('🔍 Тело ответа: ${response.body}');
+
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       await ApiService.saveTokens(data['access_token'], data['refresh_token']);
@@ -56,9 +61,15 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() => message = 'Registration successful!');
       context.go('/profile');
     } else {
-      setState(() => message = 'Error: \n${response.body}');
+      setState(() => message = 'Error: ${response.body}');
     }
+  } catch (e, stacktrace) {
+    print('❌ Ошибка при регистрации: $e');
+    print(stacktrace);
+    setState(() => message = 'Exception: $e');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
