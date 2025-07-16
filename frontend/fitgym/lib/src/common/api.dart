@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  static const String baseUrl = 'http://193.148.58.102:8080'; 
+  static const String baseUrl = 'https://barret.cybertoad.ru'; 
 
   // Registration
   static Future<http.Response> register(String email, String password) {
