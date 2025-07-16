@@ -66,6 +66,13 @@ func main() {
 		MaxAge:           300, // cache preflight response for 5 minutes
 	}))
 
+	r.Use(func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			log.Printf("➡️ %s %s | Origin: %s", r.Method, r.URL.Path, r.Header.Get("Origin"))
+			next.ServeHTTP(w, r)
+		})
+	})
+
 	// Swagger docs endpoint
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
@@ -77,7 +84,6 @@ func main() {
 	handlers.UserRepo = pg.NewUserRepository(db)
 	handlers.WorkoutRepo = pg.NewWorkoutRepository(db)
 	handlers.ExerciseRepo = pg.NewExerciseRepository(db)
-
 
 	r.Post("/addWorkout", handlers.AddWorkoutHandler)
 	r.Post("/addExercise", handlers.AddExerciseHandler)
