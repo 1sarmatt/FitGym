@@ -1,0 +1,100 @@
+name: CI/CD with Docker Compose and GitHub Pages
+
+on:
+  push:
+    branches: 
+      - main
+      - feature/devops
+      - dev
+      - feature/ci
+
+jobs:
+  build-test-deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write  # Required for gh-pages deploy
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install docker-compose -y
+
+      - name: Create .env files from example
+        run: |
+          cp ./backend/.env.example ./backend/.env
+          cp ./frontend/.env.example ./frontend/.env
+      
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.32.6'
+          channel: stable
+
+      - name: Install dependencies
+        working-directory: frontend/fitgym
+        run: flutter pub get
+
+      - name: Build Flutter Web
+        working-directory: frontend/fitgym
+        run: flutter build web --base-href="/FitGym/"
+
+      - name: Ensure required ports are free
+        run: |
+          for port in 8080 5432; do
+            if lsof -i :$port; then
+              echo "Port $port is occupied"
+              exit 1
+            else
+              echo "Port $port is free"
+            fi
+          done
+
+      - name: Build and start services
+        run: docker-compose up -d --build
+
+      - name: Wait for services to start
+        run: sleep 30
+
+      - name: Show running containers (debug)
+        run: docker ps
+
+      - name: Check postgres is running
+        run: |
+          docker ps | grep postgres && echo "Postgres is running" || (echo "Postgres is not running" && exit 1)
+
+      - name: Check backend is running
+        run: |
+          docker ps | grep backend && echo "Backend is running" || (echo "Backend is not running" && exit 1)
+
+      - name: Check frontend is running
+        run: |
+          docker ps | grep nginx && echo "Frontend is running" || (echo "Frontend is not running" && exit 1)
+
+      - name: Debug web-build volume
+        run: |
+          docker run --rm -v $(docker volume ls -qf name=web-build):/data alpine ls /data
+
+      - name: Test frontend page loads
+        run: |
+          curl -s http://localhost | grep -q "<title>" && echo "Frontend page loads" || (echo "Frontend page failed to load" && exit 1)
+
+      - name: Copy Flutter build output
+        run: cp -r frontend/fitgym/build/web ./flutter-web
+
+      - name: Shutdown containers
+        if: always()
+        run: docker-compose down -v
+
+      - name: Add 404 fallback for GitHub Pages routing
+        run: cp ./flutter-web/index.html ./flutter-web/404.html
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./flutter-web
