@@ -50,7 +50,7 @@ func main() {
 	handlers.ExerciseRepo = pg.NewExerciseRepository(db)
 
 	r.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   []string{"*"}, // или конкретные
+		AllowedOrigins:   []string{"https://fitgym-org.github.io"}, // или конкретные
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
 		ExposedHeaders:   []string{"Link"},
