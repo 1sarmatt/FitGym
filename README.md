@@ -10,11 +10,6 @@ FitGym is a simple web-based fitness tracking application built with Python, Fla
 * ✅ Simple and clean UI with Bootstrap
 * 🔐 Secure login system using Flask-Login
 
-## Screenshots
-
-![Home Page](screenshots/home.png)
-![Workout Page](screenshots/workout.png)
-
 ## Tech Stack
 
 * **Backend:** Python, Flask
