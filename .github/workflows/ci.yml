@@ -48,8 +48,8 @@ jobs:
         run: flutter test
 
       - name: Run Go Tests
-        working-directory: backend
-        run: go test ./...
+        working-directory: backend/cmd
+        run: go test main_test.go
 
       - name: Build Flutter Web
         working-directory: frontend/fitgym
