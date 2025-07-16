@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fitgym/src/common/api.dart';
+import 'package:provider/provider.dart';
+import 'package:fitgym/l10n/app_localizations.dart';
+import '../../app.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -69,6 +72,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    final themeLocale = Provider.of<ThemeLocaleNotifier>(context);
     return Scaffold(
       body: Center(
         child: SingleChildScrollView(
@@ -77,7 +82,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
               child: Card(
-                color: Colors.grey[850],
+                color: Theme.of(context).cardColor,
                 elevation: 8,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 child: Padding(
@@ -100,12 +105,12 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 8),
                       Text(_email,
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                             fontSize: 16,
                           )),
-                      Text('Age:  $_age',
+                      Text('${localizations.profile}:  $_age',
                           style: TextStyle(
-                            color: Colors.white70,
+                            color: Theme.of(context).textTheme.bodyMedium?.color,
                             fontSize: 16,
                           )),
                       const SizedBox(height: 24),
@@ -119,6 +124,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              overlayColor: Colors.transparent,
                             ),
                             onPressed: () async {
                               final result = await showDialog<Map<String, dynamic>>(
@@ -130,27 +136,27 @@ class _ProfilePageState extends State<ProfilePage> {
                                   return StatefulBuilder(
                                     builder: (dialogContext, setDialogState) {
                                       return AlertDialog(
-                                        backgroundColor: Colors.grey[900],
-                                        title: const Text('Edit Profile', style: TextStyle(color: Colors.orangeAccent)),
+                                        backgroundColor: Theme.of(context).dialogBackgroundColor,
+                                        title: Text(localizations.profile, style: TextStyle(color: Colors.orangeAccent)),
                                         content: Column(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
                                             TextField(
                                               controller: nameController,
-                                              decoration: const InputDecoration(
-                                                labelText: 'Name',
+                                              decoration: InputDecoration(
+                                                labelText: localizations.name,
                                                 labelStyle: TextStyle(color: Colors.orangeAccent),
                                               ),
-                                              style: const TextStyle(color: Colors.white),
+                                              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
                                             ),
                                             const SizedBox(height: 12),
                                             TextField(
                                               controller: ageController,
-                                              decoration: const InputDecoration(
-                                                labelText: 'Age',
+                                              decoration: InputDecoration(
+                                                labelText: localizations.age,
                                                 labelStyle: TextStyle(color: Colors.orangeAccent),
                                               ),
-                                              style: const TextStyle(color: Colors.white),
+                                              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
                                               keyboardType: TextInputType.number,
                                             ),
                                           ],
@@ -160,7 +166,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             onPressed: () {
                                               Navigator.of(dialogContext).pop();
                                             },
-                                            child: const Text('Cancel', style: TextStyle(color: Colors.orangeAccent)),
+                                            child: Text(localizations.close, style: TextStyle(color: Colors.orangeAccent)),
                                           ),
                                           ElevatedButton(
                                             onPressed: isSaving
@@ -190,7 +196,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                                   },
                                             child: isSaving
                                                 ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
-                                                : const Text('Save'),
+                                                : Text(localizations.save),
                                           ),
                                         ],
                                       );
@@ -206,7 +212,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               }
                             },
                             icon: const Icon(Icons.edit),
-                            label: const Text('Edit'),
+                            label: Text(localizations.profile),
                           ),
                           const SizedBox(width: 16),
                           ElevatedButton.icon(
@@ -216,6 +222,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                               textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              overlayColor: Colors.transparent,
                             ),
                             onPressed: () async {
                               final prefs = await SharedPreferences.getInstance();
@@ -224,7 +231,79 @@ class _ProfilePageState extends State<ProfilePage> {
                               context.go('/login');
                             },
                             icon: const Icon(Icons.logout),
-                            label: const Text('Logout'),
+                            label: Text(localizations.logout),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Theme switcher
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.brightness_6, color: Colors.orangeAccent),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: DropdownButton<ThemeMode>(
+                              value: themeLocale.themeMode,
+                              dropdownColor: Theme.of(context).cardColor,
+                              isExpanded: true,
+                              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
+                              focusColor: Colors.transparent,
+                              iconEnabledColor: Colors.orangeAccent,
+                              iconDisabledColor: Colors.orangeAccent,
+                              underline: Container(height: 0),
+                              items: [
+                                DropdownMenuItem(
+                                  value: ThemeMode.system,
+                                  child: Text(localizations.themeSwitch + ' (System)'),
+                                ),
+                                DropdownMenuItem(
+                                  value: ThemeMode.light,
+                                  child: Text(localizations.themeSwitch + ' (Light)'),
+                                ),
+                                DropdownMenuItem(
+                                  value: ThemeMode.dark,
+                                  child: Text(localizations.themeSwitch + ' (Dark)'),
+                                ),
+                              ],
+                              onChanged: (mode) {
+                                if (mode != null) themeLocale.setThemeMode(mode);
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      // Language switcher
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.language, color: Colors.orangeAccent),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: DropdownButton<Locale>(
+                              value: themeLocale.locale,
+                              dropdownColor: Theme.of(context).cardColor,
+                              isExpanded: true,
+                              style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
+                              focusColor: Colors.transparent,
+                              iconEnabledColor: Colors.orangeAccent,
+                              iconDisabledColor: Colors.orangeAccent,
+                              underline: Container(height: 0),
+                              items: [
+                                DropdownMenuItem(
+                                  value: const Locale('en'),
+                                  child: Text('English'),
+                                ),
+                                DropdownMenuItem(
+                                  value: const Locale('ru'),
+                                  child: Text('Русский'),
+                                ),
+                              ],
+                              onChanged: (locale) {
+                                if (locale != null) themeLocale.setLocale(locale);
+                              },
+                            ),
                           ),
                         ],
                       ),
@@ -233,19 +312,19 @@ class _ProfilePageState extends State<ProfilePage> {
                       const SizedBox(height: 16),
                       ListTile(
                         leading: Icon(Icons.fitness_center, color: Colors.orangeAccent),
-                        title: Text('Workout Log', style: TextStyle(color: Colors.white)),
+                        title: Text(localizations.workoutLog, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
                         trailing: Icon(Icons.arrow_forward_ios, color: Colors.orangeAccent, size: 18),
                         onTap: () => context.go('/workout-log'),
                       ),
                       ListTile(
                         leading: Icon(Icons.show_chart, color: Colors.orangeAccent),
-                        title: Text('Progress', style: TextStyle(color: Colors.white)),
+                        title: Text(localizations.progress, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
                         trailing: Icon(Icons.arrow_forward_ios, color: Colors.orangeAccent, size: 18),
                         onTap: () => context.go('/progress'),
                       ),
                       ListTile(
                         leading: Icon(Icons.people, color: Colors.orangeAccent),
-                        title: Text('Social', style: TextStyle(color: Colors.white)),
+                        title: Text(localizations.social, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color)),
                         trailing: Icon(Icons.arrow_forward_ios, color: Colors.orangeAccent, size: 18),
                         onTap: () => context.go('/social'),
                       ),
@@ -258,24 +337,26 @@ class _ProfilePageState extends State<ProfilePage> {
         ),
       ),
       bottomNavigationBar: NavigationBar(
-        backgroundColor: Colors.grey[900],
+        backgroundColor: Theme.of(context).brightness == Brightness.dark
+            ? Colors.grey[900]
+            : Theme.of(context).colorScheme.surface,
         indicatorColor: Colors.orangeAccent.withOpacity(0.1),
         selectedIndex: _selectedIndex,
         onDestinationSelected: _onNavTap,
-        destinations: const [
+        destinations: [
           NavigationDestination(
             icon: Icon(Icons.person),
-            label: 'Profile',
+            label: localizations.profile,
             tooltip: '',
           ),
           NavigationDestination(
             icon: Icon(Icons.fitness_center),
-            label: 'Workout Log',
+            label: localizations.workoutLog,
             tooltip: '',
           ),
           NavigationDestination(
             icon: Icon(Icons.show_chart),
-            label: 'Progress',
+            label: localizations.progress,
             tooltip: '',
           ),
         ],
