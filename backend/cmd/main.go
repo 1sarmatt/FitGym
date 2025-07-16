@@ -11,29 +11,11 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
-
-func withCORS(h http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        // Заголовки для всех методов
-        w.Header().Set("Access-Control-Allow-Origin", "https://1sarmatt.github.io")
-        w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-        w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-        w.Header().Set("Access-Control-Allow-Credentials", "true")
-
-        // Preflight
-        if r.Method == "OPTIONS" {
-            w.WriteHeader(http.StatusOK)
-            return
-        }
-
-        // Обычный вызов
-        h.ServeHTTP(w, r)
-    })
-}
 
 func main() {
 	// Load environment variables
@@ -67,6 +49,14 @@ func main() {
 	handlers.WorkoutRepo = pg.NewWorkoutRepository(db)
 	handlers.ExerciseRepo = pg.NewExerciseRepository(db)
 
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"*"}, // или конкретные
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300,
+	}))
 	r.Post("/addWorkout", handlers.AddWorkoutHandler)
 	r.Post("/addExercise", handlers.AddExerciseHandler)
 	r.Get("/getWorkoutHistory", handlers.GetWorkoutHistoryHandler)
@@ -93,5 +83,5 @@ func main() {
 		port = "8080"
 	}
 	log.Printf("Server running on :%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, withCORS(r)))
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
