@@ -18,7 +18,7 @@ FitGym is a simple web-based fitness tracking application built with Go, Dart Fl
 
 ## Installation
 
-Before running copy .env.exampel and create .env in frontend/fitgym and backend directoryes.
+Before running copy .env.example to frontend/fitgym and backend directoryes and rename it to .env.
 
 ### using Docker compose 
 
