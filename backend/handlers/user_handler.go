@@ -64,7 +64,7 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println(tokenPair)
 
 	w.Header().Set(contentTypeHeader, contentTypeJSON)
-	json.NewEncoder(w).Encode(tokenPair)
+	json.NewEncoder(w).Encode(*tokenPair)
 }
 
 // Handler for login of user
