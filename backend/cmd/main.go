@@ -20,6 +20,8 @@ import (
 	"os"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/cors"
+
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -28,19 +30,6 @@ import (
 
 	httpSwagger "github.com/swaggo/http-swagger"
 )
-
-func withCORS(h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-		if r.Method == "OPTIONS" {
-			w.WriteHeader(http.StatusOK)
-			return
-		}
-		h.ServeHTTP(w, r)
-	})
-}
 
 func main() {
 	// Load environment variables
@@ -77,6 +66,18 @@ func main() {
 	handlers.WorkoutRepo = pg.NewWorkoutRepository(db)
 	handlers.ExerciseRepo = pg.NewExerciseRepository(db)
 
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins: []string{
+			"https://fitgym-org.github.io", // GitHub Pages
+			"http://localhost:80",          // Local dev (optional)
+			"http://localhost:8080",        // Optional if testing backend directly
+		},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: true,
+		MaxAge:           300, // cache preflight response for 5 minutes
+	}))
 	r.Post("/addWorkout", handlers.AddWorkoutHandler)
 	r.Post("/addExercise", handlers.AddExerciseHandler)
 	r.Get("/getWorkoutHistory", handlers.GetWorkoutHistoryHandler)
@@ -103,5 +104,5 @@ func main() {
 		port = "8080"
 	}
 	log.Printf("Server running on :%s", port)
-	log.Fatal(http.ListenAndServe(":"+port, withCORS(r)))
+	log.Fatal(http.ListenAndServe(":"+port, r))
 }
