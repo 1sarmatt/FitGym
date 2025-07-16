@@ -7,8 +7,8 @@ FitGym is a simple web-based fitness tracking application built with Go, Dart Fl
 * 📝 Create and manage workouts
 * 🏋️ Add exercises with sets, reps, and weights
 * 📊 Track workout history
-* ✅ Simple and clean UI with Bootstrap
-* 🔐 Secure login system using Flask-Login
+* ✅ Simple and clean UI
+* 🔐 Secure login system
 
 ## Tech Stack
 
