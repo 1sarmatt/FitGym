@@ -90,6 +90,15 @@ Contributions are welcome! Feel free to fork this repository, make changes, and 
 ![workout log](ReadmeData/workout%20log.png)
 ![friends](ReadmeData/Frinds%20page.png)
 
+
+## Team Roles
+
+- Zavadskii Peter Team Lead / Backend
+- Zaynulin Salavat Backend
+- Lutfullin Sarmat Frontend
+- Fominykh Aleksei DevOps
+
+
 ## License
 
 MIT License. See [LICENSE](LICENSE) for more information.
