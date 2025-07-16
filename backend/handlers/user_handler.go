@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	"fitgym/backend/internal"
@@ -60,6 +61,8 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+	log.Println(tokenPair)
+
 	w.Header().Set(contentTypeHeader, contentTypeJSON)
 	json.NewEncoder(w).Encode(tokenPair)
 }
@@ -119,9 +122,9 @@ func GetProfileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
-		"id": user.ID.String(),
-		"name": user.Name,
+		"id":    user.ID.String(),
+		"name":  user.Name,
 		"email": user.Email,
-		"age": user.Age,
+		"age":   user.Age,
 	})
 }
