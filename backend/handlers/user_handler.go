@@ -90,7 +90,7 @@ func RegisterUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set(contentTypeHeader, contentTypeJSON)
-	json.NewEncoder(w).Encode(tokenPair)
+	json.NewEncoder(w).Encode(*tokenPair)
 }
 
 // LoginUserHandler godoc
