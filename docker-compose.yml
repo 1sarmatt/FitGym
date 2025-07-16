@@ -3,8 +3,8 @@ services:
     build: 
       context: ./frontend/fitgym
       dockerfile: frontend.Dockerfile
-    # depends_on:
-    #   - backend
+    depends_on:
+      - nginx
     volumes:
       - web-build:/app/build/web
     networks:

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'src/app.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() {
-  runApp(const FitGymApp());
+  dotenv.load(fileName: ".env").then((_) {
+    runApp(const FitGymApp());
+  });
 }
 
 class MyHomePage extends StatefulWidget {
