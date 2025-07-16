@@ -3,7 +3,13 @@
 ## Project Overview
 FitGym is a fitness tracking application with a Go backend and a Flutter frontend.
 
----
+## Features
+
+* 📝 Create and manage workouts
+* 🏋️ Add exercises with sets, reps, and weights
+* 📊 Track workout history
+* ✅ Simple and clean UI
+* 🔐 Secure login system
 
 ## Prerequisites
 
