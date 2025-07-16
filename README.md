@@ -1,7 +1,6 @@
-# FitGym
+# FitGym 🏋️‍♂️
 
-## Project Overview
-FitGym is a fitness tracking application with a Go backend and a Flutter frontend.
+FitGym is a simple web-based fitness tracking application built with Go, Dart Flutter and PostgreSQL. It allows users to log and manage their workout routines including exercises, sets, reps, and weight.
 
 ## Features
 
@@ -11,83 +10,68 @@ FitGym is a fitness tracking application with a Go backend and a Flutter fronten
 * ✅ Simple and clean UI
 * 🔐 Secure login system
 
-## Prerequisites
+## Tech Stack
 
-### Backend (Go)
-- Go 1.19 or newer
-- PostgreSQL (for database)
-- Docker & Docker Compose (optional, for containerized setup)
+* **Backend:** Go
+* **Frontend:** Dart, Flutter
+* **Database:** PostgresSQL
 
-### Frontend (Flutter)
-- Flutter SDK (3.x recommended)
-- Dart SDK (comes with Flutter)
-- Android Studio/Xcode (for mobile builds)
-- Node.js (for some web builds, optional)
+## Installation
 
----
+Before running copy .env.example to frontend/fitgym and backend directoryes and rename it to .env.
 
-## Backend: Build & Run
+### using Docker compose 
 
-### 1. Local Development
-```bash
+```
+docker compose up --build -d
+```
+
+### Manually
+- **For running backend part**
+
+```
 cd backend
-# Copy and edit your environment variables if needed
-cp .env.example .env
-# Run the backend
-go run ./cmd/main.go
+go mod tidy
+go run cmd/main.go
 ```
+- **For running frontend part**
 
-### 2. Docker Compose (Recommended)
-```bash
-docker-compose up --build
 ```
-This will start both the backend and the database.
-
----
-
-## Frontend: Build & Run
-
-### 1. Install Dependencies
-```bash
 cd frontend/fitgym
 flutter pub get
+flutter run
 ```
 
-### 2. Run on Web
-```bash
-flutter run -d chrome
-```
+## Contributing
 
-### 3. Run on Android/iOS
-- For Android:
-  ```bash
-  flutter run -d android
-  ```
-- For iOS (on macOS):
-  ```bash
-  flutter run -d ios
-  ```
+Contributions are welcome! Feel free to fork this repository, make changes, and open a pull request.
 
-### 4. Build for Production
-- Web:
-  ```bash
-  flutter build web
-  ```
-- Android:
-  ```bash
-  flutter build apk
-  ```
-- iOS:
-  ```bash
-  flutter build ios
-  ```
+## Screenshots of the main features
 
----
+![login page](ReadmeData/login%20page.png)
+![login image](ReadmeData/login%20image.png)
+![Register page](ReadmeData/register%20page.png)
+![Profile filling](ReadmeData/Proflie%20filling.png)
+![Light theme](ReadmeData/Light%20theme.png)
+![Rus](ReadmeData/russian.png)
+![workout log](ReadmeData/workout%20log.png)
+![friends](ReadmeData/Frinds%20page.png)
 
-## Environment Variables
-- Backend: configure `.env` in the `backend/` directory.
-- Frontend: update API endpoints in `frontend/fitgym/lib/src/common/api.dart` if needed.
+
+## Team Roles
+
+- Zavadskii Peter Team Lead / Backend
+- Zaynulin Salavat Backend
+- Lutfullin Sarmat Frontend
+- Fominykh Aleksei DevOps
+
+## Link to backlog
+
+https://github.com/orgs/Fitgym-org/projects/1
+
+
+## License
+
+MIT License. See [LICENSE](LICENSE) for more information.
 
 ---
-
-
