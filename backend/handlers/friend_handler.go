@@ -3,36 +3,79 @@ package handlers
 import (
 	"encoding/json"
 	"fitgym/backend/repository/postgres"
-
 	"log"
 	"net/http"
-
-	"github.com/google/uuid"
 )
 
 var FriendRepo *postgres.FriendRepository
 
 func AddFriendHandler(w http.ResponseWriter, r *http.Request) {
+
+	userEmail, ok := r.Context().Value("Email").(string)
+	if !ok {
+		http.Error(w, "Unable to get user information", http.StatusUnauthorized)
+		return
+	}
+
 	type reqBody struct {
-		UserID   uuid.UUID `json:"user_id"`
-		FriendID uuid.UUID `json:"friend_id"`
+		Email string `json:"friend_email"`
 	}
 	var req reqBody
 
-	err := FriendRepo.AddFriend(req.UserID, req.FriendID)
-	if err != nil {
-		log.Fatal(err)
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, errInvalidRequestBody, http.StatusBadRequest)
+		return
 	}
+
+	friendID, err := UserRepo.GetUserIDByEmail(req.Email)
+	if err != nil {
+		http.Error(w, "Friend user not found", http.StatusNotFound)
+		return
+	}
+	userID, err := UserRepo.GetUserIDByEmail(userEmail)
+	if err != nil {
+		http.Error(w, "Current user not found", http.StatusNotFound)
+		return
+	}
+
+	err = FriendRepo.AddFriend(userID, friendID)
+	if err != nil {
+		http.Error(w, "Failed to add friend", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"status": "friend added"})
 }
 
 func GetFriendsHandler(w http.ResponseWriter, r *http.Request) {
-	type reqBody struct {
-		UserID uuid.UUID `json:"user_id"`
+	userEmail, ok := r.Context().Value("Email").(string)
+	if !ok {
+		http.Error(w, "Unable to get user information", http.StatusUnauthorized)
+		return
 	}
-	var req reqBody
-	user, err := FriendRepo.GetFriends(req.UserID)
+	userID, err := UserRepo.GetUserIDByEmail(userEmail)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, "Current user not found", http.StatusNotFound)
+		return
 	}
-	json.NewEncoder(w).Encode(user)
+
+	users, err := FriendRepo.GetFriends(userID)
+	if err != nil {
+		http.Error(w, "Failed to get friends", http.StatusInternalServerError)
+		return
+	}
+	log.Println(users)
+
+	var arr []string
+	for _, user := range users {
+		curr_user, err := UserRepo.GetUserByID(user.FriendID)
+		if err != nil {
+			continue // skip this friend if not found
+		}
+
+		log.Println(curr_user)
+		arr = append(arr, curr_user.Email)
+	}
+
+	json.NewEncoder(w).Encode(arr)
 }

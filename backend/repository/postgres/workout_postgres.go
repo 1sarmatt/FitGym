@@ -22,7 +22,7 @@ func (r *WorkoutRepository) CreateWorkout(workout *model.Workout) error {
 
 func (r *WorkoutRepository) GetWorkoutsByUserID(id uuid.UUID) ([]model.Workout, error) {
 	var workouts []model.Workout
-	if err := r.db.Where("user_id = ?", id).Find(&workouts).Error; err != nil {
+	if err := r.db.Preload("Exercises").Where("user_id = ?", id).Find(&workouts).Error; err != nil {
 		return nil, err
 	}
 	return workouts, nil

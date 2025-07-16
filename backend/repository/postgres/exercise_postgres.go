@@ -35,3 +35,7 @@ func (r *ExerciseRepository) DeleteExercise(exercise *model.Exercise) error {
 func (r *ExerciseRepository) UpdateExercise(exercise *model.Exercise) error {
 	return r.db.Save(exercise).Error
 }
+
+func (r *ExerciseRepository) DeleteExercisesByWorkoutID(workoutID uuid.UUID) error {
+	return r.db.Where("workout_id = ?", workoutID).Delete(&model.Exercise{}).Error
+}
