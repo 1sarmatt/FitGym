@@ -1,0 +1,636 @@
+basePath: /
+definitions:
+  fitgym_backend_repository_model.Exercise:
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      reps:
+        type: integer
+      sets:
+        type: integer
+      weight:
+        type: integer
+      workout_id:
+        type: string
+    type: object
+  fitgym_backend_repository_model.Workout:
+    properties:
+      completed:
+        type: boolean
+      date:
+        type: string
+      exercises:
+        items:
+          $ref: '#/definitions/fitgym_backend_repository_model.Exercise'
+        type: array
+      id:
+        type: string
+      notes:
+        type: string
+      type:
+        type: string
+      user_id:
+        type: string
+    type: object
+  handlers.AddExerciseRequest:
+    properties:
+      name:
+        type: string
+      reps:
+        type: integer
+      sets:
+        type: integer
+      weight:
+        type: number
+      workout_id:
+        type: string
+    type: object
+  handlers.AddFriendRequest:
+    properties:
+      friend_email:
+        type: string
+    type: object
+  handlers.CompleteWorkoutRequest:
+    properties:
+      workout_id:
+        type: string
+    type: object
+  handlers.DeleteWorkoutRequest:
+    properties:
+      workout_id:
+        type: string
+    type: object
+  handlers.EditProfileRequest:
+    properties:
+      age:
+        type: integer
+      name:
+        type: string
+    type: object
+  handlers.EditWorkoutRequest:
+    properties:
+      date:
+        type: string
+      exercises:
+        items:
+          $ref: '#/definitions/handlers.ExerciseRequest'
+        type: array
+      id:
+        type: string
+      notes:
+        type: string
+      type:
+        type: string
+    type: object
+  handlers.ExerciseRequest:
+    properties:
+      name:
+        type: string
+      reps:
+        type: integer
+      sets:
+        type: integer
+      weight:
+        type: number
+    type: object
+  handlers.RefreshTokenRequest:
+    properties:
+      refresh_token:
+        type: string
+    type: object
+  handlers.UserCredentials:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  handlers.WorkoutRequest:
+    properties:
+      date:
+        type: string
+      duration:
+        type: integer
+      exercises:
+        items:
+          $ref: '#/definitions/handlers.ExerciseRequest'
+        type: array
+      notes:
+        type: string
+      user_id:
+        type: string
+      workout_type:
+        type: string
+    type: object
+  internal.TokenPair:
+    properties:
+      access_token:
+        type: string
+      refresh_token:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: API for FitGym fitness tracking app.
+  title: FitGym API
+  version: "1.0"
+paths:
+  /addExercise:
+    post:
+      consumes:
+      - application/json
+      description: Adds an exercise to an existing workout
+      parameters:
+      - description: Exercise info
+        in: body
+        name: exercise
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.AddExerciseRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+      summary: Add exercise to workout
+      tags:
+      - workout
+  /addFriend:
+    post:
+      consumes:
+      - application/json
+      description: Adds a friend to the user's friend list
+      parameters:
+      - description: Friend info
+        in: body
+        name: friend
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.AddFriendRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Add friend
+      tags:
+      - friend
+  /addWorkout:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new workout for a user
+      parameters:
+      - description: Workout info
+        in: body
+        name: workout
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.WorkoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/fitgym_backend_repository_model.Workout'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+      summary: Add a workout
+      tags:
+      - workout
+  /completeWorkout:
+    post:
+      consumes:
+      - application/json
+      description: Marks a workout as completed
+      parameters:
+      - description: Workout completion info
+        in: body
+        name: workout
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.CompleteWorkoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+      summary: Complete workout
+      tags:
+      - workout
+  /deleteWorkout:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a workout and its exercises
+      parameters:
+      - description: Workout delete info
+        in: body
+        name: workout
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.DeleteWorkoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Delete workout
+      tags:
+      - workout
+  /editProfile:
+    put:
+      consumes:
+      - application/json
+      description: Updates the profile of the authenticated user
+      parameters:
+      - description: Profile info
+        in: body
+        name: profile
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.EditProfileRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Edit user profile
+      tags:
+      - user
+  /editWorkout:
+    put:
+      consumes:
+      - application/json
+      description: Updates an existing workout
+      parameters:
+      - description: Workout update info
+        in: body
+        name: workout
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.EditWorkoutRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Edit workout
+      tags:
+      - workout
+  /getFriendWorkouts:
+    get:
+      description: Retrieves all workouts for a friend (with friendship check)
+      parameters:
+      - description: Friend ID
+        in: query
+        name: friend_id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/fitgym_backend_repository_model.Workout'
+            type: array
+        "400":
+          description: Invalid friend_id
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get friend's workouts
+      tags:
+      - workout
+  /getFriendWorkoutsByEmail:
+    get:
+      description: Retrieves all workouts for a friend by email (with friendship check)
+      parameters:
+      - description: Friend email
+        in: query
+        name: friend_email
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/fitgym_backend_repository_model.Workout'
+            type: array
+        "400":
+          description: Invalid friend_email
+          schema:
+            type: string
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get friend's workouts by email
+      tags:
+      - workout
+  /getFriends:
+    get:
+      description: Retrieves the user's friend list
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties: true
+              type: object
+            type: array
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get friends
+      tags:
+      - friend
+  /getProgressCharts:
+    get:
+      description: Gets progress charts data for the user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get progress charts
+      tags:
+      - analytics
+  /getWeeklySummary:
+    get:
+      description: Gets weekly workout summary for the user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get weekly summary
+      tags:
+      - analytics
+  /getWorkoutHistory:
+    get:
+      description: Retrieves workout history for a user
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/fitgym_backend_repository_model.Workout'
+            type: array
+        "400":
+          description: Invalid user_id
+          schema:
+            type: string
+      summary: Get workout history
+      tags:
+      - workout
+  /getWorkouts:
+    get:
+      description: Retrieves all workouts (active and completed) for a user
+      parameters:
+      - description: User ID
+        in: query
+        name: user_id
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/fitgym_backend_repository_model.Workout'
+            type: array
+        "400":
+          description: Invalid user_id
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get all workouts
+      tags:
+      - workout
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates user and returns tokens
+      parameters:
+      - description: User info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UserCredentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal.TokenPair'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+      summary: Login user
+      tags:
+      - auth
+  /profile:
+    get:
+      description: Returns the profile of the authenticated user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+        "401":
+          description: Unauthorized
+          schema:
+            type: string
+        "404":
+          description: User not found
+          schema:
+            type: string
+      security:
+      - BearerAuth: []
+      summary: Get user profile
+      tags:
+      - user
+  /refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refreshes JWT token
+      parameters:
+      - description: Refresh token
+        in: body
+        name: refresh_token
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RefreshTokenRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal.TokenPair'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+      summary: Refresh token
+      tags:
+      - auth
+  /register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user with email and password
+      parameters:
+      - description: User info
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UserCredentials'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/internal.TokenPair'
+        "400":
+          description: Invalid request body
+          schema:
+            type: string
+      summary: Register a new user
+      tags:
+      - auth
+securityDefinitions:
+  BearerAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
