@@ -16,6 +16,10 @@ FitGym is a simple web-based fitness tracking application built with Go, Dart Fl
 * **Frontend:** Dart, Flutter
 * **Database:** PostgresSQL
 
+## Swagger documentation
+
+http://193.148.58.102:8080/swagger/index.html
+
 ## Installation
 
 Before running copy .env.example to frontend/fitgym and backend directoryes and rename it to .env.
